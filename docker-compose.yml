@@ -1,0 +1,15 @@
+services:
+  homie:
+    image: homie:latest
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: /app/data/homie.db
+      AUTH_SECRET: ${AUTH_SECRET}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+    volumes:
+      - homie_data:/app/data
+    restart: unless-stopped
+
+volumes:
+  homie_data:
