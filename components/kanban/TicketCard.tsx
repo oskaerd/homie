@@ -1,5 +1,8 @@
+'use client'
+
+import { useDraggable } from '@dnd-kit/core'
+import { CSS } from '@dnd-kit/utilities'
 import { Ticket } from '@/lib/db/schema'
-import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 
 const priorityColors: Record<string, string> = {
@@ -15,10 +18,23 @@ interface TicketCardProps {
 }
 
 export function TicketCard({ ticket, onClick }: TicketCardProps) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: ticket.id,
+  })
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    opacity: isDragging ? 0.4 : 1,
+  }
+
   return (
     <button
+      ref={setNodeRef}
+      style={style}
+      {...listeners}
+      {...attributes}
       onClick={onClick}
-      className="w-full rounded-lg border bg-card p-3 text-left shadow-sm transition-shadow hover:shadow-md"
+      className="w-full rounded-lg border bg-card p-3 text-left shadow-sm transition-shadow hover:shadow-md cursor-grab active:cursor-grabbing"
     >
       <p className="text-sm font-medium leading-snug">{ticket.title}</p>
 

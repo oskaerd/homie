@@ -20,10 +20,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const { id } = await params
   const body = await req.json()
+  const { title, description, priority, status, dueDate, completionDate, reporter, assignee } = body
 
   const [row] = await db
     .update(tickets)
-    .set({ ...body, updatedAt: new Date() })
+    .set({ title, description, priority, status, dueDate, completionDate, reporter, assignee, updatedAt: new Date() })
     .where(eq(tickets.id, Number(id)))
     .returning()
 

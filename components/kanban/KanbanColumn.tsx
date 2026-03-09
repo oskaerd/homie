@@ -1,3 +1,6 @@
+'use client'
+
+import { useDroppable } from '@dnd-kit/core'
 import { Ticket } from '@/lib/db/schema'
 import { TicketCard } from './TicketCard'
 
@@ -24,8 +27,10 @@ interface KanbanColumnProps {
 }
 
 export function KanbanColumn({ status, tickets, onTicketClick }: KanbanColumnProps) {
+  const { setNodeRef, isOver } = useDroppable({ id: status })
+
   return (
-    <div className={`flex flex-col rounded-lg border border-t-4 bg-muted/30 ${columnColors[status]}`}>
+    <div className={`flex flex-col rounded-lg border border-t-4 bg-muted/30 ${columnColors[status]} transition-colors ${isOver ? 'bg-muted/60 ring-2 ring-primary/30' : ''}`}>
       <div className="flex items-center justify-between px-3 py-2">
         <h3 className="text-sm font-semibold">{columnLabels[status]}</h3>
         <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
@@ -33,7 +38,7 @@ export function KanbanColumn({ status, tickets, onTicketClick }: KanbanColumnPro
         </span>
       </div>
 
-      <div className="flex flex-1 flex-col gap-2 p-2 min-h-[100px]">
+      <div ref={setNodeRef} className="flex flex-1 flex-col gap-2 p-2 min-h-[100px]">
         {tickets.map((ticket) => (
           <TicketCard key={ticket.id} ticket={ticket} onClick={() => onTicketClick(ticket)} />
         ))}
