@@ -44,9 +44,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    jwt({ token, user }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id
+      }
+      // Verify the user still exists in the DB on every token refresh
+      if (token.id) {
+        const dbUser = await db.select({ id: users.id }).from(users).where(eq(users.id, token.id as string)).get()
+        if (!dbUser) return null
       }
       return token
     },

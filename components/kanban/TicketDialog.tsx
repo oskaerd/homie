@@ -16,15 +16,22 @@ import {
 } from '@/components/ui/select'
 import { format } from 'date-fns'
 
+interface UserOption {
+  id: string
+  name: string | null
+  email: string
+}
+
 interface TicketDialogProps {
   ticket: Ticket | null
   open: boolean
   onClose: () => void
   onSave: (data: Partial<Ticket>) => Promise<void>
   onDelete: (id: number) => Promise<void>
+  users: UserOption[]
 }
 
-export function TicketDialog({ ticket, open, onClose, onSave, onDelete }: TicketDialogProps) {
+export function TicketDialog({ ticket, open, onClose, onSave, onDelete, users }: TicketDialogProps) {
   const [form, setForm] = useState<Partial<Ticket>>(ticket ?? {})
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -111,11 +118,26 @@ export function TicketDialog({ ticket, open, onClose, onSave, onDelete }: Ticket
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
               <Label>Reporter</Label>
-              <Input value={form.reporter ?? ''} onChange={(e) => update('reporter', e.target.value)} />
+              <Input value={form.reporter ?? ''} readOnly className="cursor-default bg-muted" />
             </div>
             <div className="space-y-1">
               <Label>Assignee</Label>
-              <Input value={form.assignee ?? ''} onChange={(e) => update('assignee', e.target.value)} />
+              <Select
+                value={form.assignee ?? '__none__'}
+                onValueChange={(v) => update('assignee', v === '__none__' ? null : v)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Unassigned" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">Unassigned</SelectItem>
+                  {users.map((u) => (
+                    <SelectItem key={u.id} value={u.name ?? u.email}>
+                      {u.name ?? u.email}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

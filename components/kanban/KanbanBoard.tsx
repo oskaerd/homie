@@ -10,11 +10,19 @@ import { Plus } from 'lucide-react'
 
 const COLUMNS = ['todo', 'in_progress', 'blocked', 'qa', 'done'] as const
 
-interface KanbanBoardProps {
-  initialTickets: Ticket[]
+interface UserOption {
+  id: string
+  name: string | null
+  email: string
 }
 
-export function KanbanBoard({ initialTickets }: KanbanBoardProps) {
+interface KanbanBoardProps {
+  initialTickets: Ticket[]
+  users: UserOption[]
+  userName: string
+}
+
+export function KanbanBoard({ initialTickets, users, userName }: KanbanBoardProps) {
   const [tickets, setTickets] = useState<Ticket[]>(initialTickets)
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null)
   const [showCreate, setShowCreate] = useState(false)
@@ -87,12 +95,15 @@ export function KanbanBoard({ initialTickets }: KanbanBoardProps) {
         onClose={() => setSelectedTicket(null)}
         onSave={handleSave}
         onDelete={handleDelete}
+        users={users}
       />
 
       <CreateTicketDialog
         open={showCreate}
         onClose={() => setShowCreate(false)}
         onCreate={handleCreate}
+        userName={userName}
+        users={users}
       />
     </div>
   )

@@ -15,19 +15,22 @@ import {
 } from '@/components/ui/select'
 import { NewTicket } from '@/lib/db/schema'
 
+interface UserOption {
+  id: string
+  name: string | null
+  email: string
+}
+
 interface CreateTicketDialogProps {
   open: boolean
   onClose: () => void
   onCreate: (data: NewTicket) => Promise<void>
+  userName: string
+  users: UserOption[]
 }
 
-const defaultForm: Partial<NewTicket> = {
-  priority: 'medium',
-  status: 'todo',
-}
-
-export function CreateTicketDialog({ open, onClose, onCreate }: CreateTicketDialogProps) {
-  const [form, setForm] = useState<Partial<NewTicket>>(defaultForm)
+export function CreateTicketDialog({ open, onClose, onCreate, userName, users }: CreateTicketDialogProps) {
+  const [form, setForm] = useState<Partial<NewTicket>>({ priority: 'medium', status: 'todo', reporter: userName })
   const [saving, setSaving] = useState(false)
 
   function update<K extends keyof NewTicket>(key: K, value: NewTicket[K]) {
@@ -40,7 +43,7 @@ export function CreateTicketDialog({ open, onClose, onCreate }: CreateTicketDial
     setSaving(true)
     await onCreate(form as NewTicket)
     setSaving(false)
-    setForm(defaultForm)
+    setForm({ priority: 'medium', status: 'todo', reporter: userName })
   }
 
   return (
@@ -111,11 +114,26 @@ export function CreateTicketDialog({ open, onClose, onCreate }: CreateTicketDial
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
               <Label>Reporter</Label>
-              <Input value={form.reporter ?? ''} onChange={(e) => update('reporter', e.target.value)} />
+              <Input value={form.reporter ?? ''} readOnly className="cursor-default bg-muted" />
             </div>
             <div className="space-y-1">
               <Label>Assignee</Label>
-              <Input value={form.assignee ?? ''} onChange={(e) => update('assignee', e.target.value)} />
+              <Select
+                value={form.assignee ?? '__none__'}
+                onValueChange={(v) => update('assignee', v === '__none__' ? undefined : v)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Unassigned" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">Unassigned</SelectItem>
+                  {users.map((u) => (
+                    <SelectItem key={u.id} value={u.name ?? u.email}>
+                      {u.name ?? u.email}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

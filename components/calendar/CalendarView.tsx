@@ -30,14 +30,15 @@ import { cn } from '@/lib/utils'
 
 interface CalendarViewProps {
   initialEvents: Event[]
+  userName: string
 }
 
-export function CalendarView({ initialEvents }: CalendarViewProps) {
+export function CalendarView({ initialEvents, userName }: CalendarViewProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [events, setEvents] = useState<Event[]>(initialEvents)
   const [selectedDay, setSelectedDay] = useState<Date | null>(null)
   const [showCreate, setShowCreate] = useState(false)
-  const [form, setForm] = useState<Partial<NewEvent>>({})
+  const [form, setForm] = useState<Partial<NewEvent>>({ submitter: userName })
   const [saving, setSaving] = useState(false)
 
   function update<K extends keyof NewEvent>(key: K, value: NewEvent[K]) {
@@ -78,7 +79,7 @@ export function CalendarView({ initialEvents }: CalendarViewProps) {
       const created: Event = await res.json()
       setEvents((prev) => [...prev, created])
       setShowCreate(false)
-      setForm({})
+      setForm({ submitter: userName })
     }
     setSaving(false)
   }
@@ -100,7 +101,9 @@ export function CalendarView({ initialEvents }: CalendarViewProps) {
             setShowCreate(true)
             if (selectedDay) {
               const dateStr = format(selectedDay, "yyyy-MM-dd'T'HH:mm")
-              setForm({ startTime: dateStr, endTime: dateStr })
+              setForm({ submitter: userName, startTime: dateStr, endTime: dateStr })
+            } else {
+              setForm({ submitter: userName })
             }
           }}
         >
