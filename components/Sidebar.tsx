@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { Home, ClipboardList, Package, UtensilsCrossed, CalendarDays, LogOut } from 'lucide-react'
+import { LanguageSelect } from '@/components/LanguageSelect'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 
@@ -24,8 +25,9 @@ export default function Sidebar({ user }: SidebarProps) {
 
   return (
     <aside className="flex w-56 flex-col border-r bg-card">
-      <div className="flex h-14 items-center border-b px-4">
+      <div className="flex h-14 items-center justify-between border-b px-4">
         <span className="text-lg font-semibold">Homie</span>
+        <LanguageSelect />
       </div>
 
       <nav className="flex-1 space-y-1 p-3">
