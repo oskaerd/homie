@@ -183,7 +183,7 @@ export function InventoryTable({ initialItems }: InventoryTableProps) {
   }, [deleteItem])
 
   const handleAdd = useCallback(async () => {
-    if (!addForm.name) return
+    if (!addForm.name || !addForm.expirationDate || addForm.quantity == null || !addForm.unit) return
     setAddSaving(true)
     const res = await fetch('/api/inventory', {
       method: 'POST',
@@ -405,10 +405,10 @@ export function InventoryTable({ initialItems }: InventoryTableProps) {
             <div className="flex flex-1 flex-col gap-3">
               <div className="space-y-1">
                 <Label>Name *</Label>
-                <Input value={addForm.name ?? ''} onChange={(e) => updateAdd('name', e.target.value)} required />
+                <Input value={addForm.name ?? ''} onChange={(e) => updateAdd('name', e.target.value)} />
               </div>
               <div className="space-y-1">
-                <Label>Expiry Date</Label>
+                <Label>Expiry Date *</Label>
                 <Input
                   type="date"
                   value={addForm.expirationDate ?? ''}
@@ -417,7 +417,7 @@ export function InventoryTable({ initialItems }: InventoryTableProps) {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <Label>Quantity</Label>
+                  <Label>Quantity *</Label>
                   <Input
                     type="number"
                     min={0}
@@ -427,7 +427,7 @@ export function InventoryTable({ initialItems }: InventoryTableProps) {
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label>Unit</Label>
+                  <Label>Unit *</Label>
                   <Input
                     placeholder="e.g. kg, pcs"
                     value={addForm.unit ?? ''}
@@ -439,7 +439,7 @@ export function InventoryTable({ initialItems }: InventoryTableProps) {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => { setShowAdd(false); setAddPreview(null) }}>Cancel</Button>
-            <Button disabled={addSaving || addUploading} onClick={handleAdd}>
+            <Button disabled={addSaving || addUploading || !addForm.name || !addForm.expirationDate || addForm.quantity == null || !addForm.unit} onClick={handleAdd}>
               {addSaving ? 'Saving…' : 'Add'}
             </Button>
           </DialogFooter>
