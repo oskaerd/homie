@@ -29,6 +29,13 @@
       "when": 1773099698542,
       "tag": "0003_worthless_doctor_octopus",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1773100316822,
+      "tag": "0004_curved_gorgon",
+      "breakpoints": true
     }
   ]
 }

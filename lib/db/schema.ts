@@ -91,7 +91,7 @@ export const highscoreItems = sqliteTable('highscore_items', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   categoryId: integer('category_id').notNull().references(() => highscoreCategories.id, { onDelete: 'cascade' }),
   title: text('title').notNull(),
-  description: text('description').notNull(),
+  description: text('description'),
   location: text('location').notNull(),
   imageUrl: text('image_url'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(strftime('%s','now'))`),

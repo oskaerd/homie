@@ -78,7 +78,7 @@ export function HighscoresBoard({ initialCategories, initialItems }: Props) {
   }, [catName])
 
   const handleAddItem = useCallback(async () => {
-    if (!activeCat || !addForm.title || !addForm.description || !addForm.location) return
+    if (!activeCat || !addForm.title || !addForm.location) return
     setAddSaving(true)
     const res = await fetch('/api/highscores/items', {
       method: 'POST',
@@ -263,12 +263,12 @@ export function HighscoresBoard({ initialCategories, initialItems }: Props) {
             <div className="flex flex-1 flex-col gap-3">
               <div className="space-y-1"><Label>Title *</Label><Input value={addForm.title} onChange={(e) => setAddForm((f) => ({ ...f, title: e.target.value }))} /></div>
               <div className="space-y-1"><Label>Location *</Label><Input value={addForm.location} onChange={(e) => setAddForm((f) => ({ ...f, location: e.target.value }))} /></div>
-              <div className="space-y-1"><Label>Description *</Label><Textarea rows={3} value={addForm.description} onChange={(e) => setAddForm((f) => ({ ...f, description: e.target.value }))} /></div>
+              <div className="space-y-1"><Label>Description</Label><Textarea rows={3} value={addForm.description} onChange={(e) => setAddForm((f) => ({ ...f, description: e.target.value }))} /></div>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAddItem(false)}>Cancel</Button>
-            <Button disabled={addSaving || addUploading || !addForm.title || !addForm.location || !addForm.description} onClick={handleAddItem}>
+            <Button disabled={addSaving || addUploading || !addForm.title || !addForm.location} onClick={handleAddItem}>
               {addSaving ? 'Saving…' : 'Add'}
             </Button>
           </DialogFooter>
