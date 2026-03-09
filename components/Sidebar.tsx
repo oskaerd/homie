@@ -43,29 +43,42 @@ export default function Sidebar({ user }: SidebarProps) {
       </div>
 
       <nav className="flex-1 space-y-1 p-3">
-        {navItems.map(({ href, label, icon: Icon }) => (
-          <Link
-            key={href}
-            href={href}
-            className={cn(
-              'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-              pathname.startsWith(href)
-                ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-            )}
-          >
-            <Icon className="h-4 w-4" />
-            {label}
-          </Link>
-        ))}
+        {navItems.map(({ href, label, icon: Icon }) => {
+          const active = pathname.startsWith(href)
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={cn(
+                'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all',
+                active
+                  ? 'border-l-2 pl-[10px]'
+                  : 'hover:bg-[rgba(168,85,247,0.08)]'
+              )}
+              style={active ? {
+                borderColor: '#f472b6',
+                background: 'rgba(168,85,247,0.12)',
+                color: 'transparent',
+                backgroundImage: 'linear-gradient(110deg, #f472b6 0%, #a855f7 45%, #60a5fa 100%)',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                filter: 'drop-shadow(0 0 6px rgba(168,85,247,0.4))',
+              } : { color: '#9b78c9' }}
+            >
+              <Icon className="h-4 w-4 shrink-0" style={active ? { color: '#f472b6' } : {}} />
+              {label}
+            </Link>
+          )
+        })}
       </nav>
 
-      <div className="border-t p-3">
-        <p className="mb-2 truncate px-3 text-xs text-muted-foreground">{user?.name ?? user?.email}</p>
+      <div className="border-t p-3" style={{ borderColor: 'rgba(168,85,247,0.2)' }}>
+        <p className="mb-2 truncate px-3 text-xs" style={{ color: '#7a5a9e' }}>{user?.name ?? user?.email}</p>
         <Button
           variant="ghost"
           size="sm"
-          className="w-full justify-start gap-2 text-muted-foreground"
+          className="w-full justify-start gap-2 transition-colors hover:bg-[rgba(244,114,182,0.08)] hover:text-[#f472b6]"
+          style={{ color: '#7a5a9e' }}
           onClick={() => signOut({ callbackUrl: '/login' })}
         >
           <LogOut className="h-4 w-4" />
