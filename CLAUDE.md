@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Workflow rule
+
+At the end of every resolved prompt, create a git commit with a concise message summarising the changes made. Stage only the files that were modified as part of the task.
+
 ## Commands
 
 ```bash
