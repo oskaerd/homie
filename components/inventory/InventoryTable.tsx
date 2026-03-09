@@ -8,6 +8,7 @@ import { GradientButton } from '@/components/GradientButton'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import {
   Dialog,
   DialogContent,
@@ -25,21 +26,30 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Plus, Pencil, Trash2, ArrowUpDown, ImagePlus, Loader2 } from 'lucide-react'
+import { Plus, ArrowUpDown, ImagePlus, Loader2, Trash2 } from 'lucide-react'
 import { format, isPast, isWithinInterval, addDays } from 'date-fns'
+import { cn } from '@/lib/utils'
 
 interface InventoryTableProps {
   initialItems: InventoryItem[]
 }
 
-function expiryBadge(item: InventoryItem) {
+function expiryMeta(item: InventoryItem): { label: string; className: string } | null {
   if (!item.expirationDate) return null
   const expiry = new Date(item.expirationDate)
-  if (isPast(expiry))
-    return <span className="rounded-full bg-red-500/20 px-2 py-0.5 text-xs text-red-400">Expired</span>
+  if (isPast(expiry)) return { label: 'Expired', className: 'text-red-400' }
   if (isWithinInterval(expiry, { start: new Date(), end: addDays(new Date(), 7) }))
-    return <span className="rounded-full bg-yellow-500/20 px-2 py-0.5 text-xs text-yellow-400">Expiring soon</span>
+    return { label: 'Soon', className: 'text-yellow-400' }
   return null
+}
+
+function rowBg(item: InventoryItem) {
+  if (!item.expirationDate) return ''
+  const expiry = new Date(item.expirationDate)
+  if (isPast(expiry)) return 'bg-red-950/20'
+  if (isWithinInterval(expiry, { start: new Date(), end: addDays(new Date(), 7) }))
+    return 'bg-yellow-950/20'
+  return ''
 }
 
 function WarmEarthyPlaceholder() {
@@ -91,14 +101,23 @@ const emptyForm: Partial<NewInventoryItem> = { quantity: 1 }
 export function InventoryTable({ initialItems }: InventoryTableProps) {
   const [items, setItems] = useState<InventoryItem[]>(initialItems)
   const [sortAsc, setSortAsc] = useState(true)
-  const [editItem, setEditItem] = useState<InventoryItem | null>(null)
+
+  // detail sheet
+  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null)
+  const [detailForm, setDetailForm] = useState<Partial<InventoryItem>>({})
+  const [detailPreview, setDetailPreview] = useState<string | null>(null)
+  const [detailUploading, setDetailUploading] = useState(false)
+  const [detailSaving, setDetailSaving] = useState(false)
   const [deleteItem, setDeleteItem] = useState<InventoryItem | null>(null)
+  const detailFileRef = useRef<HTMLInputElement>(null)
+
+  // add dialog
   const [showAdd, setShowAdd] = useState(false)
-  const [form, setForm] = useState<Partial<NewInventoryItem>>(emptyForm)
-  const [saving, setSaving] = useState(false)
-  const [uploading, setUploading] = useState(false)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [addForm, setAddForm] = useState<Partial<NewInventoryItem>>(emptyForm)
+  const [addPreview, setAddPreview] = useState<string | null>(null)
+  const [addUploading, setAddUploading] = useState(false)
+  const [addSaving, setAddSaving] = useState(false)
+  const addFileRef = useRef<HTMLInputElement>(null)
 
   const sorted = [...items].sort((a, b) => {
     const da = a.expirationDate ?? ''
@@ -106,85 +125,80 @@ export function InventoryTable({ initialItems }: InventoryTableProps) {
     return sortAsc ? da.localeCompare(db_) : db_.localeCompare(da)
   })
 
-  function openEdit(item: InventoryItem) {
-    setEditItem(item)
-    setImagePreview(item.imageUrl ?? null)
-    setForm({
-      name: item.name,
-      expirationDate: item.expirationDate ?? undefined,
-      quantity: item.quantity,
-      unit: item.unit ?? undefined,
-      imageUrl: item.imageUrl ?? undefined,
-    })
+  function openDetail(item: InventoryItem) {
+    setSelectedItem(item)
+    setDetailForm({ ...item })
+    setDetailPreview(item.imageUrl ?? null)
   }
 
-  function openAdd() {
-    setShowAdd(true)
-    setForm(emptyForm)
-    setImagePreview(null)
+  function updateDetail<K extends keyof InventoryItem>(key: K, value: InventoryItem[K]) {
+    setDetailForm((f) => ({ ...f, [key]: value }))
   }
 
-  function update<K extends keyof NewInventoryItem>(key: K, value: NewInventoryItem[K]) {
-    setForm((f) => ({ ...f, [key]: value }))
+  function updateAdd<K extends keyof NewInventoryItem>(key: K, value: NewInventoryItem[K]) {
+    setAddForm((f) => ({ ...f, [key]: value }))
   }
 
-  async function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
+  async function uploadImage(
+    file: File,
+    setUploading: (v: boolean) => void,
+    setPreview: (url: string) => void,
+    setUrl: (url: string) => void,
+  ) {
     setUploading(true)
     const fd = new FormData()
     fd.append('file', file)
     const res = await fetch('/api/inventory/upload', { method: 'POST', body: fd })
     if (res.ok) {
       const { url } = await res.json()
-      update('imageUrl', url)
-      setImagePreview(url)
+      setPreview(url)
+      setUrl(url)
     }
     setUploading(false)
-    e.target.value = ''
   }
 
-  const handleAdd = useCallback(async () => {
-    if (!form.name) return
-    setSaving(true)
-    const res = await fetch('/api/inventory', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    })
-    if (res.ok) {
-      const item: InventoryItem = await res.json()
-      setItems((prev) => [...prev, item])
-      setShowAdd(false)
-      setForm(emptyForm)
-      setImagePreview(null)
-    }
-    setSaving(false)
-  }, [form])
-
-  const handleEdit = useCallback(async () => {
-    if (!editItem) return
-    setSaving(true)
-    const res = await fetch(`/api/inventory/${editItem.id}`, {
+  const handleDetailSave = useCallback(async () => {
+    if (!selectedItem) return
+    setDetailSaving(true)
+    const { name, expirationDate, quantity, unit, imageUrl } = detailForm
+    const res = await fetch(`/api/inventory/${selectedItem.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ name, expirationDate, quantity, unit, imageUrl }),
     })
     if (res.ok) {
       const updated: InventoryItem = await res.json()
       setItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)))
-      setEditItem(null)
-      setImagePreview(null)
+      setSelectedItem(null)
     }
-    setSaving(false)
-  }, [editItem, form])
+    setDetailSaving(false)
+  }, [selectedItem, detailForm])
 
   const handleDelete = useCallback(async () => {
     if (!deleteItem) return
     await fetch(`/api/inventory/${deleteItem.id}`, { method: 'DELETE' })
     setItems((prev) => prev.filter((i) => i.id !== deleteItem.id))
     setDeleteItem(null)
+    setSelectedItem(null)
   }, [deleteItem])
+
+  const handleAdd = useCallback(async () => {
+    if (!addForm.name) return
+    setAddSaving(true)
+    const res = await fetch('/api/inventory', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(addForm),
+    })
+    if (res.ok) {
+      const item: InventoryItem = await res.json()
+      setItems((prev) => [...prev, item])
+      setShowAdd(false)
+      setAddForm(emptyForm)
+      setAddPreview(null)
+    }
+    setAddSaving(false)
+  }, [addForm])
 
   return (
     <div className="flex flex-col gap-4">
@@ -198,120 +212,114 @@ export function InventoryTable({ initialItems }: InventoryTableProps) {
             <ArrowUpDown className="h-3.5 w-3.5" />
             Sort by expiry
           </button>
-          <GradientButton onClick={openAdd}>
+          <GradientButton onClick={() => { setShowAdd(true); setAddForm(emptyForm); setAddPreview(null) }}>
             <Plus className="h-4 w-4" />
             Add Item
           </GradientButton>
         </div>
       </div>
 
-      {sorted.length === 0 ? (
-        <p className="py-16 text-center text-muted-foreground">No items yet. Add one above.</p>
-      ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {sorted.map((item) => (
-            <div
-              key={item.id}
-              className="flex flex-col overflow-hidden rounded-xl border"
-              style={{ borderColor: 'rgba(168,85,247,0.2)', background: '#120820' }}
-            >
-              {/* Image area */}
-              <div className="relative h-36 w-full shrink-0">
-                {item.imageUrl ? (
-                  <Image
-                    src={item.imageUrl}
-                    alt={item.name}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                ) : (
-                  <WarmEarthyPlaceholder />
-                )}
-              </div>
-
-              {/* Info */}
-              <div className="flex flex-1 flex-col gap-1 p-3">
-                <p className="truncate font-semibold text-sm leading-snug" style={{ color: '#e0c4ff' }}>
-                  {item.name}
-                </p>
-                {item.expirationDate && (
-                  <p className="text-xs text-muted-foreground">
-                    {format(new Date(item.expirationDate), 'PP')}
-                  </p>
-                )}
-                <p className="text-xs text-muted-foreground">
-                  {item.quantity}{item.unit ? ` ${item.unit}` : ''}
-                </p>
-                {expiryBadge(item)}
-              </div>
-
-              {/* Actions */}
-              <div className="flex border-t px-2 py-1.5" style={{ borderColor: 'rgba(168,85,247,0.15)' }}>
-                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => openEdit(item)}>
-                  <Pencil className="h-3.5 w-3.5" />
-                </Button>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-7 w-7 text-destructive hover:text-destructive"
-                  onClick={() => setDeleteItem(item)}
+      {/* Table */}
+      <div className="rounded-lg border" style={{ borderColor: 'rgba(168,85,247,0.2)' }}>
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b" style={{ borderColor: 'rgba(168,85,247,0.15)', background: 'rgba(168,85,247,0.06)' }}>
+              <th className="px-4 py-3 text-left font-medium">Name</th>
+              <th className="px-4 py-3 text-left font-medium">Expiry Date</th>
+              <th className="px-4 py-3 text-left font-medium">Quantity</th>
+              <th className="px-4 py-3 text-left font-medium">Unit</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.length === 0 && (
+              <tr>
+                <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">
+                  No items yet. Add one above.
+                </td>
+              </tr>
+            )}
+            {sorted.map((item) => {
+              const meta = expiryMeta(item)
+              return (
+                <tr
+                  key={item.id}
+                  onClick={() => openDetail(item)}
+                  className={cn(
+                    'cursor-pointer border-b last:border-0 transition-colors hover:bg-[rgba(168,85,247,0.06)]',
+                    rowBg(item)
+                  )}
+                  style={{ borderColor: 'rgba(168,85,247,0.1)' }}
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
+                  <td className="px-4 py-3 font-medium" style={{ color: '#e0c4ff' }}>{item.name}</td>
+                  <td className="px-4 py-3 text-muted-foreground">
+                    {item.expirationDate ? (
+                      <span className="flex items-center gap-2">
+                        {format(new Date(item.expirationDate), 'PP')}
+                        {meta && <span className={cn('text-xs font-medium', meta.className)}>{meta.label}</span>}
+                      </span>
+                    ) : '—'}
+                  </td>
+                  <td className="px-4 py-3">{item.quantity}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{item.unit ?? '—'}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Detail sheet */}
+      <Sheet open={!!selectedItem} onOpenChange={(o) => !o && setSelectedItem(null)}>
+        <SheetContent className="w-[420px] overflow-y-auto sm:max-w-[420px]">
+          <SheetHeader>
+            <SheetTitle style={{ color: '#e0c4ff' }}>{selectedItem?.name}</SheetTitle>
+          </SheetHeader>
+
+          <div className="mt-4 space-y-4">
+            {/* Image */}
+            <div
+              className="relative h-52 w-full cursor-pointer overflow-hidden rounded-xl"
+              onClick={() => detailFileRef.current?.click()}
+            >
+              {detailPreview ? (
+                <Image src={detailPreview} alt="item" fill className="object-cover" unoptimized />
+              ) : (
+                <WarmEarthyPlaceholder />
+              )}
+              <div className="absolute inset-0 flex items-end justify-center pb-3 opacity-0 transition-opacity hover:opacity-100 bg-black/20">
+                <span className="flex items-center gap-1 rounded-md bg-black/60 px-3 py-1 text-xs text-white">
+                  {detailUploading ? <Loader2 className="h-3 w-3 animate-spin" /> : <ImagePlus className="h-3 w-3" />}
+                  {detailUploading ? 'Uploading…' : 'Change photo'}
+                </span>
               </div>
             </div>
-          ))}
-        </div>
-      )}
+            <input
+              ref={detailFileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (file) uploadImage(
+                  file,
+                  setDetailUploading,
+                  setDetailPreview,
+                  (url) => updateDetail('imageUrl', url),
+                )
+                e.target.value = ''
+              }}
+            />
 
-      {/* Add / Edit dialog */}
-      <Dialog
-        open={showAdd || !!editItem}
-        onOpenChange={(o) => {
-          if (!o) { setShowAdd(false); setEditItem(null); setImagePreview(null) }
-        }}
-      >
-        <DialogContent className="sm:max-w-[420px]">
-          <DialogHeader>
-            <DialogTitle>{editItem ? 'Edit Item' : 'Add Item'}</DialogTitle>
-          </DialogHeader>
-          <div className="flex gap-4">
-            {/* Photo — small square on the left */}
-            <div className="shrink-0 space-y-1">
-              <Label>Photo</Label>
-              <div
-                className="relative h-28 w-28 cursor-pointer overflow-hidden rounded-lg border-2 border-dashed transition-colors"
-                style={{ borderColor: 'rgba(168,85,247,0.3)' }}
-                onClick={() => fileInputRef.current?.click()}
-              >
-                {imagePreview ? (
-                  <Image src={imagePreview} alt="preview" fill className="object-cover" unoptimized />
-                ) : (
-                  <WarmEarthyPlaceholder />
-                )}
-                <div className="absolute inset-0 flex items-end justify-center pb-1.5 opacity-0 transition-opacity hover:opacity-100 bg-black/20">
-                  <span className="flex items-center gap-1 rounded-md bg-black/60 px-2 py-0.5 text-xs text-white">
-                    {uploading ? <Loader2 className="h-3 w-3 animate-spin" /> : <ImagePlus className="h-3 w-3" />}
-                    {uploading ? 'Uploading…' : 'Change'}
-                  </span>
-                </div>
-              </div>
-              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageSelect} />
-            </div>
-
-            {/* Fields — to the right */}
-            <div className="flex flex-1 flex-col gap-3">
             <div className="space-y-1">
-              <Label>Name *</Label>
-              <Input value={form.name ?? ''} onChange={(e) => update('name', e.target.value)} required />
+              <Label>Name</Label>
+              <Input value={detailForm.name ?? ''} onChange={(e) => updateDetail('name', e.target.value)} />
             </div>
             <div className="space-y-1">
               <Label>Expiry Date</Label>
               <Input
                 type="date"
-                value={form.expirationDate ?? ''}
-                onChange={(e) => update('expirationDate', e.target.value)}
+                value={detailForm.expirationDate ?? ''}
+                onChange={(e) => updateDetail('expirationDate', e.target.value)}
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -321,27 +329,118 @@ export function InventoryTable({ initialItems }: InventoryTableProps) {
                   type="number"
                   min={0}
                   step="any"
-                  value={form.quantity ?? 1}
-                  onChange={(e) => update('quantity', Number(e.target.value))}
+                  value={detailForm.quantity ?? 1}
+                  onChange={(e) => updateDetail('quantity', Number(e.target.value))}
                 />
               </div>
               <div className="space-y-1">
                 <Label>Unit</Label>
                 <Input
                   placeholder="e.g. kg, pcs"
-                  value={form.unit ?? ''}
-                  onChange={(e) => update('unit', e.target.value)}
+                  value={detailForm.unit ?? ''}
+                  onChange={(e) => updateDetail('unit', e.target.value ?? null)}
                 />
               </div>
             </div>
-            </div> {/* end fields column */}
-          </div> {/* end flex row */}
+
+            <div className="flex gap-2 pt-2">
+              <Button className="flex-1" disabled={detailSaving || detailUploading} onClick={handleDetailSave}>
+                {detailSaving ? 'Saving…' : 'Save'}
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => { setDeleteItem(selectedItem); }}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Add dialog */}
+      <Dialog open={showAdd} onOpenChange={(o) => { if (!o) { setShowAdd(false); setAddPreview(null) } }}>
+        <DialogContent className="sm:max-w-[440px]">
+          <DialogHeader>
+            <DialogTitle>Add Item</DialogTitle>
+          </DialogHeader>
+          <div className="flex gap-4">
+            <div className="shrink-0 space-y-1">
+              <Label>Photo</Label>
+              <div
+                className="relative h-28 w-28 cursor-pointer overflow-hidden rounded-lg border-2 border-dashed"
+                style={{ borderColor: 'rgba(168,85,247,0.3)' }}
+                onClick={() => addFileRef.current?.click()}
+              >
+                {addPreview ? (
+                  <Image src={addPreview} alt="preview" fill className="object-cover" unoptimized />
+                ) : (
+                  <WarmEarthyPlaceholder />
+                )}
+                <div className="absolute inset-0 flex items-end justify-center pb-1.5 opacity-0 transition-opacity hover:opacity-100 bg-black/20">
+                  <span className="flex items-center gap-1 rounded-md bg-black/60 px-2 py-0.5 text-xs text-white">
+                    {addUploading ? <Loader2 className="h-3 w-3 animate-spin" /> : <ImagePlus className="h-3 w-3" />}
+                    {addUploading ? 'Uploading…' : 'Add'}
+                  </span>
+                </div>
+              </div>
+              <input
+                ref={addFileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) uploadImage(
+                    file,
+                    setAddUploading,
+                    setAddPreview,
+                    (url) => updateAdd('imageUrl', url),
+                  )
+                  e.target.value = ''
+                }}
+              />
+            </div>
+
+            <div className="flex flex-1 flex-col gap-3">
+              <div className="space-y-1">
+                <Label>Name *</Label>
+                <Input value={addForm.name ?? ''} onChange={(e) => updateAdd('name', e.target.value)} required />
+              </div>
+              <div className="space-y-1">
+                <Label>Expiry Date</Label>
+                <Input
+                  type="date"
+                  value={addForm.expirationDate ?? ''}
+                  onChange={(e) => updateAdd('expirationDate', e.target.value)}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label>Quantity</Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    step="any"
+                    value={addForm.quantity ?? 1}
+                    onChange={(e) => updateAdd('quantity', Number(e.target.value))}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>Unit</Label>
+                  <Input
+                    placeholder="e.g. kg, pcs"
+                    value={addForm.unit ?? ''}
+                    onChange={(e) => updateAdd('unit', e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => { setShowAdd(false); setEditItem(null); setImagePreview(null) }}>
-              Cancel
-            </Button>
-            <Button disabled={saving || uploading} onClick={editItem ? handleEdit : handleAdd}>
-              {saving ? 'Saving…' : editItem ? 'Save' : 'Add'}
+            <Button variant="outline" onClick={() => { setShowAdd(false); setAddPreview(null) }}>Cancel</Button>
+            <Button disabled={addSaving || addUploading} onClick={handleAdd}>
+              {addSaving ? 'Saving…' : 'Add'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -356,10 +455,7 @@ export function InventoryTable({ initialItems }: InventoryTableProps) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
