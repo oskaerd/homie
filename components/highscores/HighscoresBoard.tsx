@@ -121,7 +121,7 @@ export function HighscoresBoard({ initialCategories, initialItems }: Props) {
 
   function openDetail(item: HighscoreItem) {
     setSelected(item)
-    setDetailForm({ title: item.title, description: item.description, location: item.location, imageUrl: item.imageUrl ?? '' })
+    setDetailForm({ title: item.title, description: item.description ?? '', location: item.location, imageUrl: item.imageUrl ?? '' })
     setDetailPreview(item.imageUrl ?? null)
   }
 

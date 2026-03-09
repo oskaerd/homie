@@ -12,6 +12,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const body = await req.json()
   const { name, expirationDate, quantity, unit, imageUrl } = body
 
+  if (quantity <= 0) {
+    await db.delete(inventory).where(eq(inventory.id, Number(id)))
+    return NextResponse.json({ deleted: true })
+  }
+
   const [row] = await db
     .update(inventory)
     .set({ name, expirationDate, quantity, unit, imageUrl, updatedAt: new Date() })

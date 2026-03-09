@@ -126,8 +126,12 @@ export function InventoryTable({ initialItems }: InventoryTableProps) {
       body: JSON.stringify({ name, expirationDate, quantity, unit, imageUrl }),
     })
     if (res.ok) {
-      const updated: InventoryItem = await res.json()
-      setItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)))
+      const data = await res.json()
+      if (data.deleted) {
+        setItems((prev) => prev.filter((i) => i.id !== selectedItem.id))
+      } else {
+        setItems((prev) => prev.map((i) => (i.id === data.id ? data : i)))
+      }
       setSelectedItem(null)
     }
     setDetailSaving(false)
