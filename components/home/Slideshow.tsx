@@ -6,11 +6,12 @@ import { ChevronLeft, ChevronRight, ImageOff } from 'lucide-react'
 
 interface SlideshowProps {
   images: string[]
+  onCurrentChange?: (image: string | null) => void
 }
 
 const INTERVAL_MS = 5000
 
-export function Slideshow({ images }: SlideshowProps) {
+export function Slideshow({ images, onCurrentChange }: SlideshowProps) {
   const [current, setCurrent] = useState(0)
   const [visible, setVisible] = useState(true)
 
@@ -18,7 +19,9 @@ export function Slideshow({ images }: SlideshowProps) {
     (index: number) => {
       setVisible(false)
       setTimeout(() => {
-        setCurrent((index + images.length) % images.length)
+        const next = (index + images.length) % images.length
+        setCurrent(next)
+        onCurrentChange?.(images[next] ?? null)
         setVisible(true)
       }, 300)
     },
