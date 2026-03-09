@@ -53,6 +53,7 @@ export function Slideshow({ images }: SlideshowProps) {
         className="object-contain"
         style={{ opacity: visible ? 1 : 0, transition: 'opacity 0.3s ease-in-out' }}
         priority
+        unoptimized
       />
 
       {images.length > 1 && (
