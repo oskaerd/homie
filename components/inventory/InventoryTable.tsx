@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react'
 import { InventoryItem, NewInventoryItem } from '@/lib/db/schema'
 import { PageTitle } from '@/components/PageTitle'
+import { GradientButton } from '@/components/GradientButton'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -115,10 +116,10 @@ export function InventoryTable({ initialItems }: InventoryTableProps) {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <PageTitle>Inventory</PageTitle>
-        <Button size="sm" onClick={() => { setShowAdd(true); setForm(emptyForm) }}>
-          <Plus className="mr-1 h-4 w-4" />
+        <GradientButton onClick={() => { setShowAdd(true); setForm(emptyForm) }}>
+          <Plus className="h-4 w-4" />
           Add Item
-        </Button>
+        </GradientButton>
       </div>
 
       <div className="rounded-lg border">

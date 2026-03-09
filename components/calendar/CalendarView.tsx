@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react'
 import { Event, NewEvent } from '@/lib/db/schema'
 import { PageTitle } from '@/components/PageTitle'
+import { GradientButton } from '@/components/GradientButton'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -96,8 +97,7 @@ export function CalendarView({ initialEvents, userName }: CalendarViewProps) {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <PageTitle>Calendar</PageTitle>
-        <Button
-          size="sm"
+        <GradientButton
           onClick={() => {
             setShowCreate(true)
             if (selectedDay) {
@@ -108,9 +108,9 @@ export function CalendarView({ initialEvents, userName }: CalendarViewProps) {
             }
           }}
         >
-          <Plus className="mr-1 h-4 w-4" />
+          <Plus className="h-4 w-4" />
           Add Event
-        </Button>
+        </GradientButton>
       </div>
 
       {/* Month navigation */}

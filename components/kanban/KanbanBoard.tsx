@@ -9,6 +9,7 @@ import { CreateTicketDialog } from './CreateTicketDialog'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { PageTitle } from '@/components/PageTitle'
+import { GradientButton } from '@/components/GradientButton'
 
 const COLUMNS = ['todo', 'in_progress', 'blocked', 'qa', 'done'] as const
 
@@ -110,10 +111,10 @@ export function KanbanBoard({ initialTickets, users, userName }: KanbanBoardProp
       <div className="flex h-full flex-col gap-4">
         <div className="flex items-center justify-between">
           <PageTitle>Kanban</PageTitle>
-          <Button onClick={() => setShowCreate(true)} size="sm">
-            <Plus className="mr-1 h-4 w-4" />
+          <GradientButton onClick={() => setShowCreate(true)}>
+            <Plus className="h-4 w-4" />
             New Ticket
-          </Button>
+          </GradientButton>
         </div>
 
         <div className="grid flex-1 grid-cols-5 gap-3 overflow-hidden">
