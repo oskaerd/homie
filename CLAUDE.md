@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Workflow rule
 
-At the end of every resolved prompt, create a git commit with a concise message summarising the changes made. Stage only the files that were modified as part of the task.
+At the end of every resolved prompt if there is a code change to commit, create a git commit with a concise message summarising the changes made. Stage only the files that were modified as part of the task.
 
 ## Commands
 
