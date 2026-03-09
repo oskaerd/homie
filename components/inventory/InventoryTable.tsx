@@ -100,6 +100,7 @@ const emptyForm: Partial<NewInventoryItem> = { quantity: 1 }
 
 export function InventoryTable({ initialItems }: InventoryTableProps) {
   const [items, setItems] = useState<InventoryItem[]>(initialItems)
+  const [sortField, setSortField] = useState<'expiry' | 'name'>('expiry')
   const [sortAsc, setSortAsc] = useState(true)
 
   // detail sheet
@@ -120,9 +121,9 @@ export function InventoryTable({ initialItems }: InventoryTableProps) {
   const addFileRef = useRef<HTMLInputElement>(null)
 
   const sorted = [...items].sort((a, b) => {
-    const da = a.expirationDate ?? ''
-    const db_ = b.expirationDate ?? ''
-    return sortAsc ? da.localeCompare(db_) : db_.localeCompare(da)
+    const valA = sortField === 'name' ? a.name : (a.expirationDate ?? '')
+    const valB = sortField === 'name' ? b.name : (b.expirationDate ?? '')
+    return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA)
   })
 
   function openDetail(item: InventoryItem) {
@@ -205,13 +206,6 @@ export function InventoryTable({ initialItems }: InventoryTableProps) {
       <div className="flex items-center justify-between">
         <PageTitle>Inventory</PageTitle>
         <div className="flex items-center gap-3">
-          <button
-            className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
-            onClick={() => setSortAsc((a) => !a)}
-          >
-            <ArrowUpDown className="h-3.5 w-3.5" />
-            Sort by expiry
-          </button>
           <GradientButton onClick={() => { setShowAdd(true); setAddForm(emptyForm); setAddPreview(null) }}>
             <Plus className="h-4 w-4" />
             Add Item
@@ -224,8 +218,18 @@ export function InventoryTable({ initialItems }: InventoryTableProps) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b" style={{ borderColor: 'rgba(168,85,247,0.15)', background: 'rgba(168,85,247,0.06)' }}>
-              <th className="px-4 py-3 text-left font-medium">Name</th>
-              <th className="px-4 py-3 text-left font-medium">Expiry Date</th>
+              <th className="px-4 py-3 text-left font-medium">
+                <button className="flex items-center gap-1 hover:text-foreground transition-colors" onClick={() => { if (sortField === 'name') setSortAsc((v) => !v); else { setSortField('name'); setSortAsc(true) } }}>
+                  Name
+                  <ArrowUpDown className={cn('h-3 w-3', sortField === 'name' ? 'text-foreground' : 'opacity-40')} />
+                </button>
+              </th>
+              <th className="px-4 py-3 text-left font-medium">
+                <button className="flex items-center gap-1 hover:text-foreground transition-colors" onClick={() => { if (sortField === 'expiry') setSortAsc((v) => !v); else { setSortField('expiry'); setSortAsc(true) } }}>
+                  Expiry Date
+                  <ArrowUpDown className={cn('h-3 w-3', sortField === 'expiry' ? 'text-foreground' : 'opacity-40')} />
+                </button>
+              </th>
               <th className="px-4 py-3 text-left font-medium">Quantity</th>
               <th className="px-4 py-3 text-left font-medium">Unit</th>
             </tr>
