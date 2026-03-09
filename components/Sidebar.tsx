@@ -26,7 +26,19 @@ export default function Sidebar({ user }: SidebarProps) {
   return (
     <aside className="flex w-56 flex-col border-r bg-card">
       <div className="flex h-14 items-center justify-between border-b px-4">
-        <span className="text-lg font-semibold">Homie</span>
+        <span
+          className="text-xl font-bold tracking-tight"
+          style={{
+            fontFamily: 'var(--font-space-mono), monospace',
+            background: 'linear-gradient(110deg, #f472b6 0%, #a855f7 45%, #60a5fa 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            filter: 'drop-shadow(0 0 10px rgba(168,85,247,0.6))',
+          }}
+        >
+          HOMIE
+        </span>
         <LanguageSelect />
       </div>
 
