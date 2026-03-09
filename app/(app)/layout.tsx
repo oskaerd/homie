@@ -10,12 +10,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       <Sidebar user={session.user} />
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex h-11 shrink-0 items-center justify-end border-b px-4">
+      <main className="relative flex-1 overflow-y-auto p-6">
+        <div className="absolute right-6 top-6 z-10">
           <LanguageSelect />
-        </header>
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
-      </div>
+        </div>
+        {children}
+      </main>
     </div>
   )
 }
