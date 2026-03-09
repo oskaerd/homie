@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono, Space_Mono } from 'next/font/google'
+import { Geist, Geist_Mono, Space_Mono, Fraunces } from 'next/font/google'
 import './globals.css'
 import { SessionProvider } from 'next-auth/react'
 
@@ -11,6 +11,13 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
+})
+
+const fraunces = Fraunces({
+  variable: '--font-fraunces',
+  subsets: ['latin'],
+  weight: '300',
+  style: ['italic'],
 })
 
 const spaceMono = Space_Mono({
@@ -31,7 +38,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${geistSans.variable} ${geistMono.variable} ${spaceMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${spaceMono.variable} ${fraunces.variable} antialiased`}>
         <SessionProvider>{children}</SessionProvider>
       </body>
     </html>

@@ -63,6 +63,7 @@ export const inventory = sqliteTable('inventory', {
   expirationDate: text('expiration_date'),
   quantity: real('quantity').notNull().default(1),
   unit: text('unit'),
+  imageUrl: text('image_url'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(strftime('%s','now'))`),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(strftime('%s','now'))`),
 })

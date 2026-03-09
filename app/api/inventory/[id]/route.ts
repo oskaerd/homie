@@ -10,10 +10,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const { id } = await params
   const body = await req.json()
+  const { name, expirationDate, quantity, unit, imageUrl } = body
 
   const [row] = await db
     .update(inventory)
-    .set({ ...body, updatedAt: new Date() })
+    .set({ name, expirationDate, quantity, unit, imageUrl, updatedAt: new Date() })
     .where(eq(inventory.id, Number(id)))
     .returning()
 
