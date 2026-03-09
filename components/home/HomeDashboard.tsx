@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Slideshow } from './Slideshow'
 import { SlideshowControls } from './SlideshowControls'
+import { PageTitle } from '@/components/PageTitle'
 
 interface HomeDashboardProps {
   images: string[]
@@ -14,7 +15,7 @@ export function HomeDashboard({ images }: HomeDashboardProps) {
   return (
     <div className="flex h-full flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Home</h1>
+        <PageTitle>Home</PageTitle>
         <SlideshowControls currentImage={currentImage} />
       </div>
       <div className="flex-1">

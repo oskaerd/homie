@@ -8,6 +8,7 @@ import { TicketDialog } from './TicketDialog'
 import { CreateTicketDialog } from './CreateTicketDialog'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
+import { PageTitle } from '@/components/PageTitle'
 
 const COLUMNS = ['todo', 'in_progress', 'blocked', 'qa', 'done'] as const
 
@@ -108,7 +109,7 @@ export function KanbanBoard({ initialTickets, users, userName }: KanbanBoardProp
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div className="flex h-full flex-col gap-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Kanban</h1>
+          <PageTitle>Kanban</PageTitle>
           <Button onClick={() => setShowCreate(true)} size="sm">
             <Plus className="mr-1 h-4 w-4" />
             New Ticket

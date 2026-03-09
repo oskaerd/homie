@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { Event, NewEvent } from '@/lib/db/schema'
+import { PageTitle } from '@/components/PageTitle'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -94,7 +95,7 @@ export function CalendarView({ initialEvents, userName }: CalendarViewProps) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Calendar</h1>
+        <PageTitle>Calendar</PageTitle>
         <Button
           size="sm"
           onClick={() => {

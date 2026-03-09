@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react'
 import { Meal } from '@/lib/db/schema'
+import { PageTitle } from '@/components/PageTitle'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { format, startOfWeek, addWeeks, subWeeks, addDays } from 'date-fns'
@@ -131,7 +132,7 @@ export function MealPlanner({ initialMeals, initialWeekStart }: MealPlannerProps
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Meal Planner</h1>
+        <PageTitle>Meal Planner</PageTitle>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="icon" onClick={prevWeek} disabled={loading}>
             <ChevronLeft className="h-4 w-4" />
