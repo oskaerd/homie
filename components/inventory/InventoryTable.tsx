@@ -276,12 +276,12 @@ export function InventoryTable({ initialItems }: InventoryTableProps) {
           <DialogHeader>
             <DialogTitle>{editItem ? 'Edit Item' : 'Add Item'}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3">
-            {/* Image upload */}
-            <div className="space-y-1">
+          <div className="flex gap-4">
+            {/* Photo — small square on the left */}
+            <div className="shrink-0 space-y-1">
               <Label>Photo</Label>
               <div
-                className="relative flex h-36 w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg border-2 border-dashed transition-colors hover:border-primary"
+                className="relative h-28 w-28 cursor-pointer overflow-hidden rounded-lg border-2 border-dashed transition-colors"
                 style={{ borderColor: 'rgba(168,85,247,0.3)' }}
                 onClick={() => fileInputRef.current?.click()}
               >
@@ -290,16 +290,18 @@ export function InventoryTable({ initialItems }: InventoryTableProps) {
                 ) : (
                   <WarmEarthyPlaceholder />
                 )}
-                <div className="absolute inset-0 flex items-end justify-center pb-2 opacity-0 transition-opacity hover:opacity-100 bg-black/20">
-                  <span className="flex items-center gap-1 rounded-md bg-black/60 px-2 py-1 text-xs text-white">
+                <div className="absolute inset-0 flex items-end justify-center pb-1.5 opacity-0 transition-opacity hover:opacity-100 bg-black/20">
+                  <span className="flex items-center gap-1 rounded-md bg-black/60 px-2 py-0.5 text-xs text-white">
                     {uploading ? <Loader2 className="h-3 w-3 animate-spin" /> : <ImagePlus className="h-3 w-3" />}
-                    {uploading ? 'Uploading…' : 'Change photo'}
+                    {uploading ? 'Uploading…' : 'Change'}
                   </span>
                 </div>
               </div>
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageSelect} />
             </div>
 
+            {/* Fields — to the right */}
+            <div className="flex flex-1 flex-col gap-3">
             <div className="space-y-1">
               <Label>Name *</Label>
               <Input value={form.name ?? ''} onChange={(e) => update('name', e.target.value)} required />
@@ -332,7 +334,8 @@ export function InventoryTable({ initialItems }: InventoryTableProps) {
                 />
               </div>
             </div>
-          </div>
+            </div> {/* end fields column */}
+          </div> {/* end flex row */}
           <DialogFooter>
             <Button variant="outline" onClick={() => { setShowAdd(false); setEditItem(null); setImagePreview(null) }}>
               Cancel
