@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Homie — Logo Slider</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+  /* ── Homie Logo Slider Component ── */
+
+  .homie-logo-slider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .homie-slider-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 52px 80px;
+    border-radius: 16px;
+    background: #120820;
+    border: 1px solid #2d1050;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .homie-glow-blob {
+    position: absolute;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.2;
+    pointer-events: none;
+    top: -60px; left: -60px;
+  }
+
+  .homie-logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 68px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .homie-badge {
+    margin-top: 14px;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    padding: 3px 12px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+  }
+
+  .homie-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .homie-slider-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .homie-slider-label.pink { color: #c026d3; }
+  .homie-slider-label.blue { color: #2563eb; }
+
+  .homie-range {
+    -webkit-appearance: none;
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #c026d3, #7c3aed, #2563eb);
+    outline: none;
+    cursor: pointer;
+  }
+
+  .homie-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #7c3aed;
+    box-shadow: 0 0 10px rgba(124,58,237,0.6);
+    cursor: pointer;
+  }
+</style>
+</head>
+<body style="background:#1a0a2e; display:flex; align-items:center; justify-content:center; min-height:100vh; padding:40px;">
+
+  <!-- ============================================================
+       HOMIE LOGO SLIDER — drop this block into your page
+       ============================================================ -->
+  <div class="homie-logo-slider" id="homieLogoSlider">
+    <div class="homie-slider-card">
+      <div class="homie-glow-blob" id="homieBlob"></div>
+      <div class="homie-logo"      id="homieLogo">HOMIE</div>
+      <div class="homie-badge"     id="homieBadge">&#9632; app</div>
+    </div>
+    <div class="homie-slider-row">
+      <span class="homie-slider-label pink">Pink</span>
+      <input class="homie-range" type="range" id="homieRange" min="0" max="100" value="50">
+      <span class="homie-slider-label blue">Blue</span>
+    </div>
+  </div>
+  <!-- ============================================================ -->
+
+  <script>
+    (function () {
+      const range  = document.getElementById('homieRange');
+      const logo   = document.getElementById('homieLogo');
+      const badge  = document.getElementById('homieBadge');
+      const blob   = document.getElementById('homieBlob');
+      const thumb  = document.createElement('style');
+      document.head.appendChild(thumb);
+
+      function lerp(a, b, t) { return a + (b - a) * t; }
+      function lerpColor(c1, c2, t) {
+        return [
+          Math.round(lerp(c1[0], c2[0], t)),
+          Math.round(lerp(c1[1], c2[1], t)),
+          Math.round(lerp(c1[2], c2[2], t)),
+        ];
+      }
+      function rgb(c)  { return `rgb(${c[0]},${c[1]},${c[2]})`; }
+      function hex(c)  { return '#' + c.map(v => v.toString(16).padStart(2, '0')).join(''); }
+
+      const PINK = { text:[224,196,255], sh1:[192,38,211],  sh2:[126,27,160],  bg:[192,38,211],  fg:[240,212,255], blob:[255,77,219]  };
+      const BLUE = { text:[196,216,255], sh1:[37,99,235],   sh2:[30,58,138],   bg:[37,99,235],   fg:[191,219,254], blob:[77,121,255]  };
+
+      function update() {
+        const t = range.value / 100;
+        logo.style.color       = rgb(lerpColor(PINK.text, BLUE.text, t));
+        logo.style.textShadow  = `4px 4px 0 ${rgb(lerpColor(PINK.sh1, BLUE.sh1, t))}, 8px 8px 0 ${rgb(lerpColor(PINK.sh2, BLUE.sh2, t))}`;
+        badge.style.background = rgb(lerpColor(PINK.bg,   BLUE.bg,   t));
+        badge.style.color      = rgb(lerpColor(PINK.fg,   BLUE.fg,   t));
+        blob.style.background  = rgb(lerpColor(PINK.blob, BLUE.blob, t));
+        thumb.textContent = `.homie-range::-webkit-slider-thumb { border-color: ${hex(lerpColor(PINK.sh1, BLUE.sh1, t))} !important; box-shadow: 0 0 12px ${hex(lerpColor(PINK.blob, BLUE.blob, t))}99 !important; }`;
+      }
+
+      range.addEventListener('input', update);
+      update();
+    })();
+  </script>
+
+</body>
+</html>

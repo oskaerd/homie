@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Homie — Logo</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #1a0a2e;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 48px;
+    padding: 60px 40px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(180,100,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(180,100,255,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .label {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #6b4fa0;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 52px 80px;
+    border-radius: 16px;
+    min-width: 440px;
+    background: #120820;
+    border: 1px solid #2d1050;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.18;
+    pointer-events: none;
+  }
+
+  /* ── 01 Pink ── */
+  .card-1::before { background: #ff4ddb; top: -60px; left: -60px; }
+  .logo-1 {
+    font-size: 68px; font-weight: 700; letter-spacing: -1px;
+    color: #e0c4ff;
+    text-shadow: 4px 4px 0 #c026d3, 8px 8px 0 #7e1ba0;
+    position: relative; z-index: 1;
+  }
+  .badge-1 {
+    margin-top: 14px; background: #c026d3; color: #f0d4ff;
+    font-size: 9px; letter-spacing: 0.2em; padding: 3px 12px;
+    border-radius: 3px; text-transform: uppercase; position: relative; z-index: 1;
+  }
+
+  /* ── 02 Blue ── */
+  .card-2::before { background: #4d79ff; bottom: -60px; right: -60px; }
+  .logo-2 {
+    font-size: 68px; font-weight: 700; letter-spacing: -1px;
+    color: #c4d8ff;
+    text-shadow: 4px 4px 0 #2563eb, 8px 8px 0 #1e3a8a;
+    position: relative; z-index: 1;
+  }
+  .badge-2 {
+    margin-top: 14px; background: #2563eb; color: #bfdbfe;
+    font-size: 9px; letter-spacing: 0.2em; padding: 3px 12px;
+    border-radius: 3px; text-transform: uppercase; position: relative; z-index: 1;
+  }
+
+  /* ── ANIMATED in-between ── */
+  .card-anim::before {
+    animation: blobShift 4s ease-in-out infinite alternate;
+    top: -60px; left: -60px;
+  }
+  @keyframes blobShift {
+    0%   { background: #ff4ddb; opacity: 0.18; }
+    100% { background: #4d79ff; opacity: 0.18; }
+  }
+
+  .logo-anim {
+    font-size: 68px; font-weight: 700; letter-spacing: -1px;
+    position: relative; z-index: 1;
+    animation: colorShift 4s ease-in-out infinite alternate;
+  }
+  @keyframes colorShift {
+    0%   { color: #e0c4ff; text-shadow: 4px 4px 0 #c026d3, 8px 8px 0 #7e1ba0; }
+    50%  { color: #e8d4ff; text-shadow: 4px 4px 0 #7c3aed, 8px 8px 0 #4c1d95; }
+    100% { color: #c4d8ff; text-shadow: 4px 4px 0 #2563eb, 8px 8px 0 #1e3a8a; }
+  }
+
+  .badge-anim {
+    margin-top: 14px; font-size: 9px; letter-spacing: 0.2em; padding: 3px 12px;
+    border-radius: 3px; text-transform: uppercase; position: relative; z-index: 1;
+    animation: badgeShift 4s ease-in-out infinite alternate;
+  }
+  @keyframes badgeShift {
+    0%   { background: #c026d3; color: #f0d4ff; }
+    50%  { background: #7c3aed; color: #ede9fe; }
+    100% { background: #2563eb; color: #bfdbfe; }
+  }
+
+  /* ── SLIDER ── */
+  .slider-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 600px;
+  }
+
+  .slider-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 52px 80px;
+    border-radius: 16px;
+    width: 100%;
+    background: #120820;
+    border: 1px solid #2d1050;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .glow-blob {
+    position: absolute;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.2;
+    pointer-events: none;
+    top: -60px; left: -60px;
+  }
+
+  .logo-interactive {
+    font-size: 68px; font-weight: 700; letter-spacing: -1px;
+    position: relative; z-index: 1;
+  }
+
+  .badge-interactive {
+    margin-top: 14px;
+    font-size: 9px; letter-spacing: 0.2em; padding: 3px 12px;
+    border-radius: 3px; text-transform: uppercase;
+    position: relative; z-index: 1;
+  }
+
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .slider-end-label { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; white-space: nowrap; }
+  .slider-end-label.pink { color: #c026d3; }
+  .slider-end-label.blue { color: #2563eb; }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    flex: 1; height: 4px; border-radius: 2px;
+    background: linear-gradient(90deg, #c026d3, #7c3aed, #2563eb);
+    outline: none; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #fff; border: 3px solid #7c3aed;
+    box-shadow: 0 0 10px rgba(124,58,237,0.6);
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+  <div class="section">
+    <div class="label">01 — Hot Pink Shadow</div>
+    <div class="card card-1">
+      <div class="logo-1">HOMIE</div>
+      <div class="badge-1">&#9632; app</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="label">↕ Animated In-Between</div>
+    <div class="card card-anim">
+      <div class="logo-anim">HOMIE</div>
+      <div class="badge-anim">&#9632; app</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="label">02 — Electric Blue Shadow</div>
+    <div class="card card-2">
+      <div class="logo-2">HOMIE</div>
+      <div class="badge-2">&#9632; app</div>
+    </div>
+  </div>
+
+  <div class="slider-section">
+    <div class="label">⟵ drag to blend ⟶</div>
+    <div class="slider-card">
+      <div class="glow-blob" id="blob"></div>
+      <div class="logo-interactive" id="logoSlider">HOMIE</div>
+      <div class="badge-interactive" id="badgeSlider">&#9632; app</div>
+    </div>
+    <div class="slider-row">
+      <span class="slider-end-label pink">Pink</span>
+      <input type="range" id="blendSlider" min="0" max="100" value="50">
+      <span class="slider-end-label blue">Blue</span>
+    </div>
+  </div>
+
+<script>
+  const slider  = document.getElementById('blendSlider');
+  const logo    = document.getElementById('logoSlider');
+  const badge   = document.getElementById('badgeSlider');
+  const blob    = document.getElementById('blob');
+  const dynStyle = document.createElement('style');
+  document.head.appendChild(dynStyle);
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function lerpColor(c1, c2, t) {
+    return [Math.round(lerp(c1[0],c2[0],t)), Math.round(lerp(c1[1],c2[1],t)), Math.round(lerp(c1[2],c2[2],t))];
+  }
+  function rgb(c) { return `rgb(${c[0]},${c[1]},${c[2]})`; }
+  function hex(c) { return '#'+c.map(v=>v.toString(16).padStart(2,'0')).join(''); }
+
+  const P = {
+    text:    [224,196,255],
+    shadow1: [192, 38,211],
+    shadow2: [126, 27,160],
+    badgeBg: [192, 38,211],
+    badgeFg: [240,212,255],
+    blob:    [255, 77,219],
+  };
+  const B = {
+    text:    [196,216,255],
+    shadow1: [ 37, 99,235],
+    shadow2: [ 30, 58,138],
+    badgeBg: [ 37, 99,235],
+    badgeFg: [191,219,254],
+    blob:    [ 77,121,255],
+  };
+
+  function update() {
+    const t = slider.value / 100;
+    const text    = rgb(lerpColor(P.text,    B.text,    t));
+    const sh1     = rgb(lerpColor(P.shadow1, B.shadow1, t));
+    const sh2     = rgb(lerpColor(P.shadow2, B.shadow2, t));
+    const bgBadge = rgb(lerpColor(P.badgeBg, B.badgeBg, t));
+    const fgBadge = rgb(lerpColor(P.badgeFg, B.badgeFg, t));
+    const blobCol = rgb(lerpColor(P.blob,    B.blob,    t));
+    const thumbHex = hex(lerpColor(P.shadow1, B.shadow1, t));
+    const glowHex  = hex(lerpColor(P.blob,   B.blob,    t));
+
+    logo.style.color      = text;
+    logo.style.textShadow = `4px 4px 0 ${sh1}, 8px 8px 0 ${sh2}`;
+    badge.style.background = bgBadge;
+    badge.style.color      = fgBadge;
+    blob.style.background  = blobCol;
+
+    dynStyle.textContent = `
+      input[type=range]::-webkit-slider-thumb {
+        border-color: ${thumbHex} !important;
+        box-shadow: 0 0 12px ${glowHex}99 !important;
+      }
+    `;
+  }
+
+  slider.addEventListener('input', update);
+  update();
+</script>
+</body>
+</html>

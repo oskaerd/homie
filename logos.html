@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Homie — Retro Logo Variations</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #1a0a2e;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 72px;
+    padding: 72px 40px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* subtle grid overlay for retro texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(180,100,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(180,100,255,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .label {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #6b4fa0;
+    margin-bottom: 20px;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 52px 80px;
+    border-radius: 16px;
+    min-width: 440px;
+    background: #120820;
+    border: 1px solid #2d1050;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* glow blob in background of each card */
+  .card::before {
+    content: '';
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.18;
+    pointer-events: none;
+  }
+
+  /* ─── OPTION 1: Neon Pink shadow ─── */
+  .card-1::before { background: #ff4ddb; top: -60px; left: -60px; }
+
+  .logo-1 {
+    font-family: 'Space Mono', monospace;
+    font-size: 68px;
+    font-weight: 700;
+    color: #e0c4ff;
+    letter-spacing: -1px;
+    text-shadow:
+      4px 4px 0 #c026d3,
+      8px 8px 0 #7e1ba0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .badge-1 {
+    margin-top: 14px;
+    background: #c026d3;
+    color: #f0d4ff;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    padding: 3px 12px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ─── OPTION 2: Electric Blue shadow ─── */
+  .card-2::before { background: #4d79ff; bottom: -60px; right: -60px; }
+
+  .logo-2 {
+    font-family: 'Space Mono', monospace;
+    font-size: 68px;
+    font-weight: 700;
+    color: #c4d8ff;
+    letter-spacing: -1px;
+    text-shadow:
+      4px 4px 0 #2563eb,
+      8px 8px 0 #1e3a8a;
+    position: relative;
+    z-index: 1;
+  }
+
+  .badge-2 {
+    margin-top: 14px;
+    background: #2563eb;
+    color: #bfdbfe;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    padding: 3px 12px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ─── OPTION 3: Gradient text, pink→blue ─── */
+  .card-3::before { background: #a855f7; top: -40px; right: -40px; }
+
+  .logo-3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 68px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    background: linear-gradient(110deg, #f472b6 0%, #a855f7 45%, #60a5fa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 18px rgba(168,85,247,0.5));
+    position: relative;
+    z-index: 1;
+  }
+
+  .badge-3 {
+    margin-top: 14px;
+    border: 1px solid #a855f7;
+    color: #d8b4fe;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    padding: 3px 12px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+    background: rgba(168,85,247,0.1);
+  }
+
+  /* ─── OPTION 4: Chromatic aberration split ─── */
+  .card-4::before { background: #ec4899; bottom: -40px; left: -40px; }
+
+  .logo-4-wrap {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .logo-4 {
+    font-family: 'Space Mono', monospace;
+    font-size: 68px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -1px;
+    position: relative;
+  }
+
+  /* chromatic aberration layers */
+  .logo-4::before {
+    content: 'HOMIE';
+    position: absolute;
+    left: -3px;
+    top: 3px;
+    color: #f472b6;
+    opacity: 0.75;
+    mix-blend-mode: screen;
+  }
+
+  .logo-4::after {
+    content: 'HOMIE';
+    position: absolute;
+    left: 3px;
+    top: -3px;
+    color: #60a5fa;
+    opacity: 0.75;
+    mix-blend-mode: screen;
+  }
+
+  .badge-4 {
+    margin-top: 14px;
+    background: linear-gradient(90deg, #f472b6, #818cf8);
+    color: #fff;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    padding: 3px 12px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+
+</style>
+</head>
+<body>
+
+  <!-- 1: Pink/Purple -->
+  <div class="section">
+    <div class="label">01 — Hot Pink Shadow</div>
+    <div class="card card-1">
+      <div class="logo-1">HOMIE</div>
+      <div class="badge-1">&#9632; app</div>
+    </div>
+  </div>
+
+  <!-- 2: Blue Shadow -->
+  <div class="section">
+    <div class="label">02 — Electric Blue Shadow</div>
+    <div class="card card-2">
+      <div class="logo-2">HOMIE</div>
+      <div class="badge-2">&#9632; app</div>
+    </div>
+  </div>
+
+  <!-- 3: Gradient Text -->
+  <div class="section">
+    <div class="label">03 — Pink → Purple → Blue Gradient</div>
+    <div class="card card-3">
+      <div class="logo-3">HOMIE</div>
+      <div class="badge-3">&#9632; app</div>
+    </div>
+  </div>
+
+  <!-- 4: Chromatic Aberration -->
+  <div class="section">
+    <div class="label">04 — Chromatic Aberration</div>
+    <div class="card card-4">
+      <div class="logo-4-wrap">
+        <div class="logo-4">HOMIE</div>
+        <div class="badge-4">&#9632; app</div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
