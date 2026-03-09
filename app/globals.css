@@ -83,11 +83,11 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: #1a0a2e;
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
+  --card: #120820;
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
+  --popover: #120820;
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.922 0 0);
   --primary-foreground: oklch(0.205 0 0);
@@ -122,5 +122,9 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image:
+      linear-gradient(rgba(180, 100, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(180, 100, 255, 0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
   }
 }
