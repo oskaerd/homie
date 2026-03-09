@@ -79,6 +79,16 @@ export const meals = sqliteTable('meals', {
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(strftime('%s','now'))`),
 })
 
+// ─── Wishlist ─────────────────────────────────────────────────────────────────
+
+export const wishlist = sqliteTable('wishlist', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  title: text('title').notNull(),
+  description: text('description'),
+  owner: text('owner', { enum: ['natalia', 'oskar'] }).notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(strftime('%s','now'))`),
+})
+
 // ─── Calendar ─────────────────────────────────────────────────────────────────
 
 export const events = sqliteTable('events', {
@@ -102,3 +112,5 @@ export type Meal = typeof meals.$inferSelect
 export type NewMeal = typeof meals.$inferInsert
 export type Event = typeof events.$inferSelect
 export type NewEvent = typeof events.$inferInsert
+export type WishlistItem = typeof wishlist.$inferSelect
+export type NewWishlistItem = typeof wishlist.$inferInsert
