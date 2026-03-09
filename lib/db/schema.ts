@@ -79,6 +79,24 @@ export const meals = sqliteTable('meals', {
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(strftime('%s','now'))`),
 })
 
+// ─── Highscores ───────────────────────────────────────────────────────────────
+
+export const highscoreCategories = sqliteTable('highscore_categories', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(strftime('%s','now'))`),
+})
+
+export const highscoreItems = sqliteTable('highscore_items', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  categoryId: integer('category_id').notNull().references(() => highscoreCategories.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  location: text('location').notNull(),
+  imageUrl: text('image_url'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(strftime('%s','now'))`),
+})
+
 // ─── Wishlist ─────────────────────────────────────────────────────────────────
 
 export const wishlist = sqliteTable('wishlist', {
@@ -112,5 +130,8 @@ export type Meal = typeof meals.$inferSelect
 export type NewMeal = typeof meals.$inferInsert
 export type Event = typeof events.$inferSelect
 export type NewEvent = typeof events.$inferInsert
+export type HighscoreCategory = typeof highscoreCategories.$inferSelect
+export type HighscoreItem = typeof highscoreItems.$inferSelect
+export type NewHighscoreItem = typeof highscoreItems.$inferInsert
 export type WishlistItem = typeof wishlist.$inferSelect
 export type NewWishlistItem = typeof wishlist.$inferInsert

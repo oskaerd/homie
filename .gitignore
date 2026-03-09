@@ -53,3 +53,5 @@ next-env.d.ts
 !/public/slideshow/.gitkeep
 /public/inventory/*
 !/public/inventory/.gitkeep
+/public/highscores/*
+!/public/highscores/.gitkeep
