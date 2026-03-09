@@ -27,7 +27,8 @@ export default function Sidebar({ user }: SidebarProps) {
   return (
     <aside className="flex w-56 flex-col border-r bg-card">
       <div className="flex h-14 items-center justify-between border-b px-4">
-        <span
+        <Link
+          href="/home"
           className="text-xl font-bold tracking-tight"
           style={{
             fontFamily: 'var(--font-space-mono), monospace',
@@ -39,7 +40,7 @@ export default function Sidebar({ user }: SidebarProps) {
           }}
         >
           HOMIE
-        </span>
+        </Link>
         <LanguageSelect />
       </div>
 
