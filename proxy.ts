@@ -14,7 +14,7 @@ export default auth((req) => {
   }
 
   if (isLoggedIn && isAuthPage) {
-    return NextResponse.redirect(new URL('/kanban', req.url))
+    return NextResponse.redirect(new URL('/home', req.url))
   }
 
   return NextResponse.next()

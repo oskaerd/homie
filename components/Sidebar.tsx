@@ -3,11 +3,12 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
-import { ClipboardList, Package, UtensilsCrossed, CalendarDays, LogOut } from 'lucide-react'
+import { Home, ClipboardList, Package, UtensilsCrossed, CalendarDays, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 
 const navItems = [
+  { href: '/home', label: 'Home', icon: Home },
   { href: '/kanban', label: 'Kanban', icon: ClipboardList },
   { href: '/inventory', label: 'Inventory', icon: Package },
   { href: '/meals', label: 'Meals', icon: UtensilsCrossed },

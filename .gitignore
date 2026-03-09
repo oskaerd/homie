@@ -47,3 +47,7 @@ next-env.d.ts
 /config/allowed-users.ts
 
 .prompts/*
+
+# Slideshow photos — add your images to public/slideshow/ on the RPi, they won't be committed
+/public/slideshow/*
+!/public/slideshow/.gitkeep
