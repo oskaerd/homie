@@ -3,7 +3,7 @@ import { recipes } from '@/lib/db/schema'
 import { CookbookBoard } from '@/components/cookbook/CookbookBoard'
 
 export default async function CookbookPage() {
-  const rows = await db.select().from(recipes).orderBy(recipes.createdAt)
+  const rows = await db.select().from(recipes).orderBy(recipes.title)
   const parsed = rows.map(r => ({ ...r, ingredients: JSON.parse(r.ingredients) }))
   return <CookbookBoard initialRecipes={parsed} />
 }
