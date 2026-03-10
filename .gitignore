@@ -48,12 +48,4 @@ next-env.d.ts
 
 .prompts/*
 
-# Slideshow photos — add your images to public/slideshow/ on the RPi, they won't be committed
-/public/slideshow/*
-!/public/slideshow/.gitkeep
-/public/inventory/*
-!/public/inventory/.gitkeep
-/public/highscores/*
-!/public/highscores/.gitkeep
-/public/cookbook/*
-!/public/cookbook/.gitkeep
+# Uploaded files — stored in data/uploads/ (covered by /data/ above)

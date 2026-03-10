@@ -1,4 +1,7 @@
 #!/bin/sh
+# Create upload directories (persisted in the data volume)
+mkdir -p /app/data/uploads/slideshow /app/data/uploads/inventory /app/data/uploads/highscores /app/data/uploads/cookbook
+
 # Run migrations then start the app
 node -e "
 const { drizzle } = require('drizzle-orm/better-sqlite3');
