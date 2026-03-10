@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { Menu, Home, ClipboardList, Package, UtensilsCrossed, CalendarDays, Gift, Trophy, BookOpen, LogOut } from 'lucide-react'
-import { Sheet, SheetContent } from '@/components/ui/sheet'
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -49,6 +50,7 @@ export function MobileHeader({ user }: Props) {
 
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="left" className="flex w-56 flex-col p-0 border-r" style={{ borderColor: 'rgba(168,85,247,0.2)', background: 'var(--card)' }}>
+          <VisuallyHidden><SheetTitle>Navigation</SheetTitle></VisuallyHidden>
           <div className="flex h-14 items-center border-b px-4" style={{ borderColor: 'rgba(168,85,247,0.2)' }}>
             <span
               className="text-xl font-bold tracking-tight"
