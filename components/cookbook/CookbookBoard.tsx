@@ -98,7 +98,7 @@ interface Props {
 
 export function CookbookBoard({ initialRecipes }: Props) {
   const [recipes, setRecipes] = useState(initialRecipes)
-  const [activeLabel, setActiveLabel] = useState<RecipeLabel | 'all'>('all')
+  const [hiddenLabels, setHiddenLabels] = useState<Set<RecipeLabel>>(new Set())
 
   const [showAdd, setShowAdd] = useState(false)
   const [addForm, setAddForm] = useState<RecipeForm>(emptyForm())
@@ -115,7 +115,7 @@ export function CookbookBoard({ initialRecipes }: Props) {
   const [deleteItem, setDeleteItem] = useState<ParsedRecipe | null>(null)
   const detailFileRef = useRef<HTMLInputElement>(null)
 
-  const visible = activeLabel === 'all' ? recipes : recipes.filter(r => r.label === activeLabel)
+  const visible = recipes.filter(r => !hiddenLabels.has(r.label as RecipeLabel))
 
   async function uploadImage(file: File, setUploading: (v: boolean) => void, onDone: (url: string) => void) {
     setUploading(true)
@@ -247,27 +247,27 @@ export function CookbookBoard({ initialRecipes }: Props) {
         </GradientButton>
       </div>
 
-      {/* Label filter pills */}
+      {/* Label filter pills — all on by default, click to hide */}
       <div className="flex flex-wrap gap-2">
-        <button
-          onClick={() => setActiveLabel('all')}
-          className={cn('rounded-full px-4 py-1 text-sm font-medium transition-all', activeLabel === 'all' ? 'text-white' : 'text-muted-foreground hover:text-foreground')}
-          style={activeLabel === 'all' ? { background: 'linear-gradient(110deg, #f472b6 0%, #a855f7 45%, #60a5fa 100%)', boxShadow: '0 0 10px rgba(168,85,247,0.4)' } : { background: 'rgba(168,85,247,0.1)' }}
-        >
-          All
-        </button>
-        {LABELS.map(label => (
-          <button
-            key={label}
-            onClick={() => setActiveLabel(label)}
-            className={cn('rounded-full px-4 py-1 text-sm font-medium transition-all', activeLabel === label ? 'text-white' : 'text-muted-foreground hover:text-foreground')}
-            style={activeLabel === label
-              ? { background: LABEL_COLORS[label], boxShadow: `0 0 10px ${LABEL_COLORS[label]}99` }
-              : { background: 'rgba(168,85,247,0.1)' }}
-          >
-            {LABEL_DISPLAY[label]}
-          </button>
-        ))}
+        {LABELS.map(label => {
+          const hidden = hiddenLabels.has(label)
+          return (
+            <button
+              key={label}
+              onClick={() => setHiddenLabels(prev => {
+                const next = new Set(prev)
+                hidden ? next.delete(label) : next.add(label)
+                return next
+              })}
+              className={cn('rounded-full px-4 py-1 text-sm font-medium transition-all', hidden ? 'text-muted-foreground line-through' : 'text-white')}
+              style={hidden
+                ? { background: 'rgba(168,85,247,0.1)' }
+                : { background: LABEL_COLORS[label], boxShadow: `0 0 10px ${LABEL_COLORS[label]}99` }}
+            >
+              {LABEL_DISPLAY[label]}
+            </button>
+          )
+        })}
       </div>
 
       {/* Recipe grid */}
