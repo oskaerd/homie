@@ -18,7 +18,7 @@ export function HomeDashboard({ images }: HomeDashboardProps) {
         <PageTitle>Home</PageTitle>
         <SlideshowControls currentImage={currentImage} />
       </div>
-      <div className="flex-1">
+      <div className="min-h-[55vh] flex-1">
         <Slideshow images={images} onCurrentChange={setCurrentImage} />
       </div>
     </div>

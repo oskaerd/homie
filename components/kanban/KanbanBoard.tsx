@@ -117,15 +117,18 @@ export function KanbanBoard({ initialTickets, users, userName }: KanbanBoardProp
           </GradientButton>
         </div>
 
-        <div className="grid flex-1 grid-cols-5 gap-3 overflow-hidden">
-          {COLUMNS.map((status) => (
-            <KanbanColumn
-              key={status}
-              status={status}
-              tickets={ticketsByStatus[status] ?? []}
-              onTicketClick={setSelectedTicket}
-            />
-          ))}
+        <div className="flex-1 overflow-x-auto md:overflow-hidden">
+          <div className="flex h-full min-w-max gap-3 md:grid md:min-w-0 md:grid-cols-5">
+            {COLUMNS.map((status) => (
+              <div key={status} className="flex w-[240px] flex-col md:w-auto">
+                <KanbanColumn
+                  status={status}
+                  tickets={ticketsByStatus[status] ?? []}
+                  onTicketClick={setSelectedTicket}
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
         <TicketDialog
