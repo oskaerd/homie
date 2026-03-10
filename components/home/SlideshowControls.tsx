@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Upload, Trash2, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { GradientButton } from '@/components/GradientButton'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -63,20 +64,18 @@ export function SlideshowControls({ currentImage }: SlideshowControlsProps) {
         className="hidden"
         onChange={handleUpload}
       />
-      <Button
-        size="sm"
-        variant="outline"
-        onClick={() => inputRef.current?.click()}
-        disabled={uploading}
-      >
+      <GradientButton onClick={() => inputRef.current?.click()} disabled={uploading}>
         {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
         {uploading ? 'Uploading…' : 'Upload photos'}
-      </Button>
+      </GradientButton>
 
       {currentImage && (
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button size="sm" variant="outline" disabled={deleting}>
+            <Button
+              size="sm" variant="outline" disabled={deleting}
+              className="border-[rgba(168,85,247,0.4)] text-[#9b78c9] hover:bg-[rgba(168,85,247,0.08)] hover:text-[#f472b6]"
+            >
               {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             </Button>
           </AlertDialogTrigger>

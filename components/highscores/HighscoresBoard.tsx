@@ -130,7 +130,11 @@ export function HighscoresBoard({ initialCategories, initialItems }: Props) {
       <div className="flex items-center justify-between">
         <PageTitle>Highscores</PageTitle>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setShowAddCat(true)}>
+          <Button
+            variant="outline" size="sm"
+            className="gap-1.5 border-[rgba(168,85,247,0.4)] text-[#9b78c9] hover:bg-[rgba(168,85,247,0.08)] hover:text-[#f472b6]"
+            onClick={() => setShowAddCat(true)}
+          >
             <FolderPlus className="h-4 w-4" />
             New Category
           </Button>
