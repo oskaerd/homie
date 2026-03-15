@@ -122,7 +122,7 @@ export const wishlist = sqliteTable('wishlist', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   title: text('title').notNull(),
   description: text('description'),
-  owner: text('owner', { enum: ['natalia', 'oskar'] }).notNull(),
+  owner: text('owner').notNull(), // stores user.id
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(strftime('%s','now'))`),
 })
 

@@ -28,38 +28,35 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Plus, Trash2 } from 'lucide-react'
 
-const OWNERS = ['natalia', 'oskar'] as const
-type Owner = typeof OWNERS[number]
+const COLUMN_STYLES = [
+  { gradient: 'linear-gradient(110deg, #f472b6 0%, #e879a0 100%)', glow: 'rgba(244,114,182,0.5)' },
+  { gradient: 'linear-gradient(110deg, #818cf8 0%, #60a5fa 100%)', glow: 'rgba(129,140,248,0.5)' },
+]
 
-const ownerGradient: Record<Owner, string> = {
-  natalia: 'linear-gradient(110deg, #f472b6 0%, #e879a0 100%)',
-  oskar:   'linear-gradient(110deg, #818cf8 0%, #60a5fa 100%)',
-}
-
-const ownerGlow: Record<Owner, string> = {
-  natalia: 'rgba(244,114,182,0.5)',
-  oskar:   'rgba(129,140,248,0.5)',
-}
+type ColumnUser = { id: string; name: string | null; email: string }
 
 interface WishlistBoardProps {
   initialItems: WishlistItem[]
+  users: ColumnUser[]
 }
 
-function ColumnHeader({ owner }: { owner: Owner }) {
+function ColumnHeader({ user, index }: { user: ColumnUser; index: number }) {
+  const style = COLUMN_STYLES[index % COLUMN_STYLES.length]
+  const label = user.name ?? user.email.split('@')[0]
   return (
     <h2
       className="text-2xl font-bold tracking-tight"
       style={{
         fontFamily: 'var(--font-space-mono), monospace',
-        background: ownerGradient[owner],
+        background: style.gradient,
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         backgroundClip: 'text',
-        filter: `drop-shadow(0 0 8px ${ownerGlow[owner]})`,
+        filter: `drop-shadow(0 0 8px ${style.glow})`,
         textTransform: 'capitalize',
       }}
     >
-      {owner}
+      {label}
     </h2>
   )
 }
@@ -79,7 +76,7 @@ function ItemCard({ item, onClick }: { item: WishlistItem; onClick: () => void }
   )
 }
 
-export function WishlistBoard({ initialItems }: WishlistBoardProps) {
+export function WishlistBoard({ initialItems, users }: WishlistBoardProps) {
   const [items, setItems] = useState<WishlistItem[]>(initialItems)
   const [selected, setSelected] = useState<WishlistItem | null>(null)
   const [detailForm, setDetailForm] = useState<{ title: string; description: string }>({ title: '', description: '' })
@@ -87,7 +84,7 @@ export function WishlistBoard({ initialItems }: WishlistBoardProps) {
   const [deleteItem, setDeleteItem] = useState<WishlistItem | null>(null)
 
   const [showAdd, setShowAdd] = useState(false)
-  const [addOwner, setAddOwner] = useState<Owner>('natalia')
+  const [addOwner, setAddOwner] = useState<ColumnUser | null>(users[0] ?? null)
   const [addForm, setAddForm] = useState({ title: '', description: '' })
   const [addSaving, setAddSaving] = useState(false)
 
@@ -96,7 +93,7 @@ export function WishlistBoard({ initialItems }: WishlistBoardProps) {
     setDetailForm({ title: item.title, description: item.description ?? '' })
   }
 
-  function openAdd(owner: Owner) {
+  function openAdd(owner: ColumnUser) {
     setAddOwner(owner)
     setAddForm({ title: '', description: '' })
     setShowAdd(true)
@@ -108,7 +105,7 @@ export function WishlistBoard({ initialItems }: WishlistBoardProps) {
     const res = await fetch('/api/wishlist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...addForm, owner: addOwner }),
+      body: JSON.stringify({ ...addForm, owner: addOwner?.id }),
     })
     if (res.ok) {
       const item: WishlistItem = await res.json()
@@ -147,23 +144,23 @@ export function WishlistBoard({ initialItems }: WishlistBoardProps) {
       <PageTitle>Wishlist</PageTitle>
 
       <div className="grid flex-1 grid-cols-2 gap-6 overflow-hidden">
-        {OWNERS.map((owner) => (
-          <div key={owner} className="flex flex-col gap-3 overflow-hidden rounded-xl border p-4"
+        {users.map((user, index) => (
+          <div key={user.id} className="flex flex-col gap-3 overflow-hidden rounded-xl border p-4"
             style={{ borderColor: 'rgba(168,85,247,0.2)', background: 'rgba(168,85,247,0.04)' }}>
             <div className="flex items-center justify-between">
-              <ColumnHeader owner={owner} />
-              <GradientButton onClick={() => openAdd(owner)}>
+              <ColumnHeader user={user} index={index} />
+              <GradientButton onClick={() => openAdd(user)}>
                 <Plus className="h-4 w-4" />
                 Add
               </GradientButton>
             </div>
 
             <div className="flex flex-col gap-2 overflow-y-auto">
-              {items.filter((i) => i.owner === owner).length === 0 && (
+              {items.filter((i) => i.owner === user.id).length === 0 && (
                 <p className="py-8 text-center text-sm text-muted-foreground">Nothing here yet.</p>
               )}
               {items
-                .filter((i) => i.owner === owner)
+                .filter((i) => i.owner === user.id)
                 .map((item) => (
                   <ItemCard key={item.id} item={item} onClick={() => openDetail(item)} />
                 ))}
@@ -209,8 +206,8 @@ export function WishlistBoard({ initialItems }: WishlistBoardProps) {
           <DialogHeader>
             <DialogTitle>
               Add to{' '}
-              <span style={{ background: ownerGradient[addOwner], WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', textTransform: 'capitalize' }}>
-                {addOwner}
+              <span style={{ background: COLUMN_STYLES[users.indexOf(addOwner!) % COLUMN_STYLES.length]?.gradient, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', textTransform: 'capitalize' }}>
+                {addOwner ? (addOwner.name ?? addOwner.email.split('@')[0]) : ''}
               </span>
               's wishlist
             </DialogTitle>
