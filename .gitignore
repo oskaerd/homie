@@ -53,3 +53,6 @@ next-env.d.ts
 .prompts/*
 
 # Uploaded files — stored in data/uploads/ (covered by /data/ above)
+
+# Docker image export
+*.tar
