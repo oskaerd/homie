@@ -2,22 +2,30 @@
 # Sets up the homie cron job for automated DB backups.
 # Run this once on the RPi host after deploying with docker compose.
 #
-# Usage: ./scripts/install.sh [backup-dir]
-#   backup-dir  host path for backup files (default: ./backups)
+# Usage: ./scripts/install.sh
 #
-# Example: ./scripts/install.sh /mnt/nas/homie-backups
+# To use a custom backup location, set BACKUP_DIR before running:
+#   BACKUP_DIR=/mnt/nas/homie-backups ./scripts/install.sh
+# The path must already exist. If unset or missing, defaults to ./backups next to the DB.
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"
 ENV_FILE="$REPO_DIR/.env"
-BACKUP_DIR="${1:-$REPO_DIR/backups}"
 CRON_JOB="*/30 * * * * docker exec homie node scripts/backup-db.js --keep 48"
 
-# Create the backup directory so Docker bind-mount doesn't create it as root
-mkdir -p "$BACKUP_DIR"
-echo "Backup directory: $BACKUP_DIR"
+# Resolve backup directory
+if [ -n "$BACKUP_DIR" ] && [ -d "$BACKUP_DIR" ]; then
+  echo "Using BACKUP_DIR: $BACKUP_DIR"
+else
+  if [ -n "$BACKUP_DIR" ]; then
+    echo "Warning: BACKUP_DIR=$BACKUP_DIR does not exist, falling back to default."
+  fi
+  BACKUP_DIR="$REPO_DIR/backups"
+  mkdir -p "$BACKUP_DIR"
+  echo "Using default backup directory: $BACKUP_DIR"
+fi
 
-# Write BACKUP_DIR to .env so docker compose picks it up
+# Write BACKUP_DIR to .env so docker compose picks it up for the bind-mount
 if grep -q "^BACKUP_DIR=" "$ENV_FILE" 2>/dev/null; then
   sed -i "s|^BACKUP_DIR=.*|BACKUP_DIR=$BACKUP_DIR|" "$ENV_FILE"
   echo "Updated BACKUP_DIR in $ENV_FILE"
