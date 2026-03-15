@@ -10,7 +10,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "reset-password": "node scripts/reset-password.js"
+    "reset-password": "node scripts/reset-password.js",
+    "db:backup": "node scripts/backup-db.js"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.1",

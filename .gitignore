@@ -42,6 +42,7 @@ next-env.d.ts
 
 # database
 /data/
+/backups/
 
 # private config — copy allowed-users.template.ts → allowed-users.ts and fill in your emails
 /config/allowed-users.ts

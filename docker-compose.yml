@@ -9,6 +9,7 @@ services:
       NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
     volumes:
       - homie_data:/app/data
+      - ./backups:/app/data/backups
       # Mount a folder from the RPi host so you can drop photos in without rebuilding the image.
       # Create the folder first: mkdir -p ~/homie-slideshow
       - ${SLIDESHOW_DIR:-./public/slideshow}:/app/public/slideshow
