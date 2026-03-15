@@ -44,8 +44,8 @@ Open [http://localhost:3000](http://localhost:3000), register with one of the al
 **On your dev machine** — build and transfer the image:
 
 ```bash
-docker buildx build --platform linux/arm/v7 -t homie .
-# For RPi 4 / 64-bit OS: --platform linux/arm64
+docker buildx build --platform linux/arm64 -t homie .
+# For 32-bit OS: --platform linux/arm/v7
 
 docker save homie | gzip | ssh pi@raspberrypi.local 'gunzip | docker load'
 scp docker-compose.yml Caddyfile scripts/ pi@raspberrypi.local:~/homie/
