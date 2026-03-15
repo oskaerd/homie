@@ -89,7 +89,6 @@ docker exec homie node scripts/backup-db.js
 | `NEXTAUTH_URL` | Yes | `http://localhost:3000` | Public base URL of the app |
 | `DATABASE_URL` | No | `/app/data/homie.db` | Path to the SQLite database file |
 | `BACKUP_DIR` | No | `./backups` | Host path for the backup bind-mount (set by `install.sh`) |
-| `SLIDESHOW_DIR` | No | `./public/slideshow` | Host path for slideshow photos |
 
 ## Data persistence
 
