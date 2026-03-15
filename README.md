@@ -41,7 +41,17 @@ Open [http://localhost:3000](http://localhost:3000), register with one of the al
 
 ### 3. Deploy to Raspberry Pi
 
-**On your dev machine** — build and transfer the image:
+**On your dev machine** — install prerequisites (one-time):
+
+```bash
+# Install Docker Desktop (Mac) or Docker Engine (Linux)
+# https://www.docker.com/products/docker-desktop/
+
+# Enable cross-platform ARM builds via QEMU emulation
+docker run --privileged --rm tonistiigi/binfmt --install all
+```
+
+Build and transfer the image:
 
 ```bash
 docker buildx build --platform linux/arm64 -t homie .
