@@ -5,9 +5,12 @@ A household management app for two. Runs locally on a Raspberry Pi, accessible f
 ## Features
 
 - **Kanban board** — shared task/chore tracking with drag-and-drop (todo, in progress, blocked, QA, done)
-- **Inventory** — food/drink storage tracker with expiry dates
+- **Inventory** — food/drink storage tracker with expiry dates, auto-delete on zero quantity
 - **Meal planner** — weekly view (Mon–Sun) with 5 meal slots per day
 - **Calendar** — household events and appointments
+- **Wishlist** — two-column wishlist (one per person)
+- **Highscores** — personal records by category with optional photo and description
+- **Cookbook** — recipes with ingredients, macros, and label filters
 
 ## Stack
 
@@ -16,10 +19,6 @@ A household management app for two. Runs locally on a Raspberry Pi, accessible f
 - Auth.js v5 — email/password login, invite-only via allowlist
 - Tailwind CSS v4 + shadcn/ui
 - Docker + docker-compose for RPi deployment
-
-## Data persistence
-
-All data is stored in a SQLite file on disk. In development this is `./data/homie.db`. In Docker it lives in a named volume (`homie_data`) mounted at `/app/data`, so it survives container restarts and image updates.
 
 ## Getting started
 
@@ -58,32 +57,55 @@ AUTH_SECRET=<random-secret> NEXTAUTH_URL=http://<rpi-ip>:3000 docker-compose up 
 
 The app will be available at `http://<rpi-ip>:3000` from any device on the local network.
 
-## Database scripts
+### 4. Set up automated backups (on the RPi)
+
+Run the install script once after deployment:
 
 ```bash
-npm run db:generate   # Generate migrations after schema changes
-npm run db:migrate    # Apply pending migrations
-npm run db:studio     # Open Drizzle Studio (browser UI for the DB)
-npm run reset-password  # Reset a user's password via CLI
+# Default — backups go to ./backups next to docker-compose.yml
+./scripts/install.sh
+
+# Custom location (path must already exist)
+BACKUP_DIR=/mnt/nas/homie-backups ./scripts/install.sh
 ```
 
----
+This creates the backup directory, writes `BACKUP_DIR` to `.env`, and installs a cron job that backs up the database every 30 minutes (keeping the last 48 snapshots — 24 hours of coverage). Then restart the container to apply the new bind-mount:
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+```bash
+docker compose up -d
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+To run a backup manually at any time:
 
-## Learn More
+```bash
+docker exec homie node scripts/backup-db.js
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Environment variables
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `AUTH_SECRET` | Yes | — | Random secret for Auth.js session signing |
+| `NEXTAUTH_URL` | Yes | `http://localhost:3000` | Public base URL of the app |
+| `DATABASE_URL` | No | `/app/data/homie.db` | Path to the SQLite database file |
+| `BACKUP_DIR` | No | `./backups` | Host path for the backup bind-mount (set by `install.sh`) |
+| `SLIDESHOW_DIR` | No | `./public/slideshow` | Host path for slideshow photos |
 
-You can check out the [Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Data persistence
 
-## Deploy on Vercel
+All data is stored in a SQLite file on disk. In development this is `./data/homie.db`. In Docker it lives in a named volume (`homie_data`) mounted at `/app/data`, so it survives container restarts and image updates.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Uploaded files (inventory photos, highscore images, etc.) are stored in `./data/uploads/` inside the same volume.
 
-Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Scripts
+
+```bash
+npm run dev              # Start dev server (localhost:3000)
+npm run build            # Production build (also type-checks)
+npm run lint             # ESLint
+npm run db:generate      # Generate Drizzle migrations after schema changes
+npm run db:migrate       # Apply pending migrations
+npm run db:studio        # Open Drizzle Studio (browser UI for the DB)
+npm run db:backup        # Take a manual DB backup (dev)
+npm run reset-password   # Reset a user's password: node scripts/reset-password.js <email> <password>
+```
