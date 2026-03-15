@@ -44,6 +44,9 @@ next-env.d.ts
 /data/
 /backups/
 
+# TLS certificates (provisioned by Tailscale on the RPi)
+/certs/
+
 # private config — copy allowed-users.template.ts → allowed-users.ts and fill in your emails
 /config/allowed-users.ts
 

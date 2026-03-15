@@ -41,39 +41,36 @@ Open [http://localhost:3000](http://localhost:3000), register with one of the al
 
 ### 3. Deploy to Raspberry Pi
 
-Build the image on your dev machine (adjust platform for your RPi model):
+**On your dev machine** — build and transfer the image:
 
 ```bash
 docker buildx build --platform linux/arm/v7 -t homie .
-# For RPi 4 / 64-bit OS:
-# docker buildx build --platform linux/arm64 -t homie .
+# For RPi 4 / 64-bit OS: --platform linux/arm64
+
+docker save homie | gzip | ssh pi@raspberrypi.local 'gunzip | docker load'
+scp docker-compose.yml Caddyfile scripts/ pi@raspberrypi.local:~/homie/
 ```
 
-Copy `docker-compose.yml` to the RPi, set environment variables, and start:
+**On the RPi** — install Tailscale, then run the install script:
 
 ```bash
-AUTH_SECRET=<random-secret> NEXTAUTH_URL=http://<rpi-ip>:3000 docker-compose up -d
-```
+# Install Tailscale (if not already done)
+curl -fsSL https://tailscale.com/install.sh | sh
+sudo tailscale up
+# Enable MagicDNS in the Tailscale admin panel, note your hostname
 
-The app will be available at `http://<rpi-ip>:3000` from any device on the local network.
+# Create .env with your secrets
+echo "AUTH_SECRET=$(openssl rand -base64 32)" >> ~/homie/.env
 
-### 4. Set up automated backups (on the RPi)
+# Run install script — provisions TLS cert, sets up backup cron
+cd ~/homie
+TAILSCALE_HOSTNAME=raspberrypi.tail1234.ts.net ./scripts/install.sh
 
-Run the install script once after deployment:
-
-```bash
-# Default — backups go to ./backups next to docker-compose.yml
-./scripts/install.sh
-
-# Custom location (path must already exist)
-BACKUP_DIR=/mnt/nas/homie-backups ./scripts/install.sh
-```
-
-This creates the backup directory, writes `BACKUP_DIR` to `.env`, and installs a cron job that backs up the database every 30 minutes (keeping the last 48 snapshots — 24 hours of coverage). Then restart the container to apply the new bind-mount:
-
-```bash
+# Start everything
 docker compose up -d
 ```
+
+The app will be available at `https://raspberrypi.tail1234.ts.net` from any device running Tailscale.
 
 To run a backup manually at any time:
 
@@ -85,8 +82,9 @@ docker exec homie node scripts/backup-db.js
 
 | Variable | Required | Default | Description |
 |---|---|---|---|
-| `AUTH_SECRET` | Yes | — | Random secret for Auth.js session signing |
-| `NEXTAUTH_URL` | Yes | `http://localhost:3000` | Public base URL of the app |
+| `AUTH_SECRET` | Yes | — | Random secret for Auth.js session signing. Generate with `openssl rand -base64 32` |
+| `TAILSCALE_HOSTNAME` | Yes | — | MagicDNS hostname, e.g. `raspberrypi.tail1234.ts.net`. Set by `install.sh` |
+| `NEXTAUTH_URL` | No | derived | Derived automatically as `https://${TAILSCALE_HOSTNAME}` |
 | `DATABASE_URL` | No | `/app/data/homie.db` | Path to the SQLite database file |
 | `BACKUP_DIR` | No | `./backups` | Host path for the backup bind-mount (set by `install.sh`) |
 

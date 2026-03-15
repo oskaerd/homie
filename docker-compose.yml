@@ -1,16 +1,30 @@
 services:
   homie:
     image: homie:latest
-    ports:
-      - "3000:3000"
     environment:
       DATABASE_URL: /app/data/homie.db
       AUTH_SECRET: ${AUTH_SECRET}
-      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      NEXTAUTH_URL: https://${TAILSCALE_HOSTNAME}
     volumes:
       - homie_data:/app/data
       - ${BACKUP_DIR:-./backups}:/app/data/backups
     restart: unless-stopped
 
+  caddy:
+    image: caddy:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      TAILSCALE_HOSTNAME: ${TAILSCALE_HOSTNAME}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./certs:/certs:ro
+      - caddy_data:/data
+    depends_on:
+      - homie
+    restart: unless-stopped
+
 volumes:
   homie_data:
+  caddy_data:

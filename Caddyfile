@@ -1,0 +1,4 @@
+{$TAILSCALE_HOSTNAME} {
+    reverse_proxy homie:3000
+    tls /certs/{$TAILSCALE_HOSTNAME}.crt /certs/{$TAILSCALE_HOSTNAME}.key
+}
