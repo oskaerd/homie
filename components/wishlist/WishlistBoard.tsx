@@ -76,6 +76,7 @@ function ItemCard({ item, onClick }: { item: WishlistItem; onClick: () => void }
 }
 
 export function WishlistBoard({ initialItems, users }: WishlistBoardProps) {
+  const [activeUser, setActiveUser] = useState<string>(users[0]?.id ?? '')
   const [items, setItems] = useState<WishlistItem[]>(initialItems)
   const [selected, setSelected] = useState<WishlistItem | null>(null)
   const [detailForm, setDetailForm] = useState<{ title: string; description: string }>({ title: '', description: '' })
@@ -142,10 +143,30 @@ export function WishlistBoard({ initialItems, users }: WishlistBoardProps) {
     <div className="flex h-full flex-col gap-4">
       <PageTitle>Wishlist</PageTitle>
 
-      {/* Mobile: horizontal scroll snap. Desktop: side-by-side grid */}
-      <div className="flex flex-1 snap-x snap-mandatory overflow-x-auto gap-4 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-hidden">
-        {users.map((user, index) => (
-          <div key={user.id} className="flex w-[85vw] shrink-0 snap-center flex-col gap-3 overflow-hidden rounded-xl border p-4 sm:w-auto"
+      {/* Mobile: tab pills to switch columns. Desktop: side-by-side grid */}
+      <div className="flex gap-2 sm:hidden">
+        {users.map((user, index) => {
+          const style = COLUMN_STYLES[index % COLUMN_STYLES.length]
+          const label = user.name ?? user.email.split('@')[0]
+          const active = activeUser === user.id
+          return (
+            <button
+              key={user.id}
+              onClick={() => setActiveUser(user.id)}
+              className="rounded-full px-4 py-1 text-sm font-medium transition-all capitalize"
+              style={active
+                ? { background: style.gradient, color: '#fff', boxShadow: `0 0 10px ${style.glow}` }
+                : { background: 'rgba(168,85,247,0.1)', color: '#9b78c9' }}
+            >
+              {label}
+            </button>
+          )
+        })}
+      </div>
+
+      <div className="flex-1 sm:hidden">
+        {users.map((user, index) => user.id !== activeUser ? null : (
+          <div key={user.id} className="flex h-full flex-col gap-3 overflow-hidden rounded-xl border p-4"
             style={{ borderColor: 'rgba(168,85,247,0.2)', background: 'rgba(168,85,247,0.04)' }}>
             <div className="flex items-center justify-between gap-2">
               <ColumnHeader user={user} index={index} />
@@ -154,16 +175,36 @@ export function WishlistBoard({ initialItems, users }: WishlistBoardProps) {
                 Add
               </GradientButton>
             </div>
-
             <div className="flex flex-col gap-2 overflow-y-auto">
               {items.filter((i) => i.owner === user.id).length === 0 && (
                 <p className="py-8 text-center text-sm text-muted-foreground">Nothing here yet.</p>
               )}
-              {items
-                .filter((i) => i.owner === user.id)
-                .map((item) => (
-                  <ItemCard key={item.id} item={item} onClick={() => openDetail(item)} />
-                ))}
+              {items.filter((i) => i.owner === user.id).map((item) => (
+                <ItemCard key={item.id} item={item} onClick={() => openDetail(item)} />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="hidden flex-1 grid-cols-2 gap-6 overflow-hidden sm:grid">
+        {users.map((user, index) => (
+          <div key={user.id} className="flex flex-col gap-3 overflow-hidden rounded-xl border p-4"
+            style={{ borderColor: 'rgba(168,85,247,0.2)', background: 'rgba(168,85,247,0.04)' }}>
+            <div className="flex items-center justify-between gap-2">
+              <ColumnHeader user={user} index={index} />
+              <GradientButton onClick={() => openAdd(user)}>
+                <Plus className="h-4 w-4" />
+                Add
+              </GradientButton>
+            </div>
+            <div className="flex flex-col gap-2 overflow-y-auto">
+              {items.filter((i) => i.owner === user.id).length === 0 && (
+                <p className="py-8 text-center text-sm text-muted-foreground">Nothing here yet.</p>
+              )}
+              {items.filter((i) => i.owner === user.id).map((item) => (
+                <ItemCard key={item.id} item={item} onClick={() => openDetail(item)} />
+              ))}
             </div>
           </div>
         ))}
