@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import {
   Dialog,
   DialogContent,
@@ -169,13 +168,13 @@ export function WishlistBoard({ initialItems, users }: WishlistBoardProps) {
         ))}
       </div>
 
-      {/* Detail sheet */}
-      <Sheet open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
-        <SheetContent className="w-[420px] overflow-y-auto sm:max-w-[420px]">
-          <SheetHeader>
-            <SheetTitle style={{ color: '#e0c4ff' }}>{selected?.title}</SheetTitle>
-          </SheetHeader>
-          <div className="mt-6 space-y-4">
+      {/* Detail dialog */}
+      <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
+        <DialogContent className="sm:max-w-[420px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle style={{ color: '#e0c4ff' }}>{selected?.title}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
             <div className="space-y-1">
               <Label>Title</Label>
               <Input value={detailForm.title} onChange={(e) => setDetailForm((f) => ({ ...f, title: e.target.value }))} />
@@ -197,8 +196,8 @@ export function WishlistBoard({ initialItems, users }: WishlistBoardProps) {
               </Button>
             </div>
           </div>
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
 
       {/* Add dialog */}
       <Dialog open={showAdd} onOpenChange={(o) => !o && setShowAdd(false)}>

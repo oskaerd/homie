@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { Plus, ImagePlus, Loader2, Trash2, X } from 'lucide-react'
@@ -304,12 +303,12 @@ export function CookbookBoard({ initialRecipes }: Props) {
         </div>
       )}
 
-      {/* Detail / edit sheet */}
-      <Sheet open={!!selected} onOpenChange={o => !o && setSelected(null)}>
-        <SheetContent className="w-[520px] overflow-y-auto sm:max-w-[520px]">
-          <SheetHeader>
-            <SheetTitle style={{ color: '#e0c4ff' }}>{selected?.title}</SheetTitle>
-          </SheetHeader>
+      {/* Detail / edit dialog */}
+      <Dialog open={!!selected} onOpenChange={o => !o && setSelected(null)}>
+        <DialogContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle style={{ color: '#e0c4ff' }}>{selected?.title}</DialogTitle>
+          </DialogHeader>
           <div className="mt-4 space-y-4">
             {/* Photo */}
             <div className="relative h-52 w-full cursor-pointer overflow-hidden rounded-xl" onClick={() => detailFileRef.current?.click()}>
@@ -369,8 +368,8 @@ export function CookbookBoard({ initialRecipes }: Props) {
               <Button variant="destructive" onClick={() => setDeleteItem(selected)}><Trash2 className="h-4 w-4" /></Button>
             </div>
           </div>
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
 
       {/* Add recipe dialog */}
       <Dialog open={showAdd} onOpenChange={o => !o && setShowAdd(false)}>

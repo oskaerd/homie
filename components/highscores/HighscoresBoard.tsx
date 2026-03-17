@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { Plus, FolderPlus, ImagePlus, Loader2, Trash2 } from 'lucide-react'
@@ -136,12 +135,12 @@ export function HighscoresBoard({ initialCategories, initialItems }: Props) {
             onClick={() => setShowAddCat(true)}
           >
             <FolderPlus className="h-4 w-4" />
-            New Category
+            <span className="hidden sm:inline">New Category</span>
           </Button>
           {activeCat && (
             <GradientButton onClick={() => { setAddForm({ title: '', description: '', location: '', imageUrl: '' }); setAddPreview(null); setShowAddItem(true) }}>
               <Plus className="h-4 w-4" />
-              Add Item
+              <span className="hidden sm:inline">Add Item</span>
             </GradientButton>
           )}
         </div>
@@ -198,12 +197,12 @@ export function HighscoresBoard({ initialCategories, initialItems }: Props) {
         </div>
       )}
 
-      {/* Detail sheet */}
-      <Sheet open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
-        <SheetContent className="w-[440px] overflow-y-auto sm:max-w-[440px]">
-          <SheetHeader>
-            <SheetTitle style={{ color: '#e0c4ff' }}>{selected?.title}</SheetTitle>
-          </SheetHeader>
+      {/* Detail dialog */}
+      <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
+        <DialogContent className="sm:max-w-[440px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle style={{ color: '#e0c4ff' }}>{selected?.title}</DialogTitle>
+          </DialogHeader>
           <div className="mt-4 space-y-4">
             <div className="relative h-52 w-full cursor-pointer overflow-hidden rounded-xl" onClick={() => detailFileRef.current?.click()}>
               {detailPreview ? (
@@ -233,8 +232,8 @@ export function HighscoresBoard({ initialCategories, initialItems }: Props) {
               <Button variant="destructive" onClick={() => setDeleteItem(selected)}><Trash2 className="h-4 w-4" /></Button>
             </div>
           </div>
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
 
       {/* Add item dialog */}
       <Dialog open={showAddItem} onOpenChange={(o) => !o && setShowAddItem(false)}>

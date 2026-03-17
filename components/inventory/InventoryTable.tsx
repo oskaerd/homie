@@ -8,7 +8,6 @@ import { GradientButton } from '@/components/GradientButton'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import {
   Dialog,
   DialogContent,
@@ -234,12 +233,12 @@ export function InventoryTable({ initialItems }: InventoryTableProps) {
         </table>
       </div>
 
-      {/* Detail sheet */}
-      <Sheet open={!!selectedItem} onOpenChange={(o) => !o && setSelectedItem(null)}>
-        <SheetContent className="w-[420px] overflow-y-auto sm:max-w-[420px]">
-          <SheetHeader>
-            <SheetTitle style={{ color: '#e0c4ff' }}>{selectedItem?.name}</SheetTitle>
-          </SheetHeader>
+      {/* Detail dialog */}
+      <Dialog open={!!selectedItem} onOpenChange={(o) => !o && setSelectedItem(null)}>
+        <DialogContent className="sm:max-w-[420px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle style={{ color: '#e0c4ff' }}>{selectedItem?.name}</DialogTitle>
+          </DialogHeader>
 
           <div className="mt-4 space-y-4">
             {/* Image */}
@@ -288,7 +287,7 @@ export function InventoryTable({ initialItems }: InventoryTableProps) {
                 onChange={(e) => updateDetail('expirationDate', e.target.value)}
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
                 <Label>Quantity</Label>
                 <Input
@@ -321,8 +320,8 @@ export function InventoryTable({ initialItems }: InventoryTableProps) {
               </Button>
             </div>
           </div>
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
 
       {/* Add dialog */}
       <Dialog open={showAdd} onOpenChange={(o) => { if (!o) { setShowAdd(false); setAddPreview(null) } }}>
