@@ -142,11 +142,12 @@ export function WishlistBoard({ initialItems, users }: WishlistBoardProps) {
     <div className="flex h-full flex-col gap-4">
       <PageTitle>Wishlist</PageTitle>
 
-      <div className="grid flex-1 grid-cols-2 gap-6 overflow-hidden">
+      {/* Mobile: horizontal scroll snap. Desktop: side-by-side grid */}
+      <div className="flex flex-1 snap-x snap-mandatory overflow-x-auto gap-4 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-hidden">
         {users.map((user, index) => (
-          <div key={user.id} className="flex flex-col gap-3 overflow-hidden rounded-xl border p-4"
+          <div key={user.id} className="flex w-[85vw] shrink-0 snap-center flex-col gap-3 overflow-hidden rounded-xl border p-4 sm:w-auto"
             style={{ borderColor: 'rgba(168,85,247,0.2)', background: 'rgba(168,85,247,0.04)' }}>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <ColumnHeader user={user} index={index} />
               <GradientButton onClick={() => openAdd(user)}>
                 <Plus className="h-4 w-4" />
