@@ -62,7 +62,8 @@ export function TicketDialog({ ticket, open, onClose, onSave, onDelete, users }:
 
   return (
     <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
-      <SheetContent className="w-[480px] overflow-y-auto sm:max-w-[480px]">
+      <SheetContent className="w-[480px] sm:max-w-[480px] flex flex-col h-full overflow-hidden">
+        <div className="flex-1 overflow-y-auto pr-1">
         <SheetHeader>
           <SheetTitle>Ticket #{ticket.id}</SheetTitle>
         </SheetHeader>
@@ -167,6 +168,7 @@ export function TicketDialog({ ticket, open, onClose, onSave, onDelete, users }:
               {deleting ? 'Deleting…' : 'Delete'}
             </Button>
           </div>
+        </div>
         </div>
       </SheetContent>
     </Sheet>
