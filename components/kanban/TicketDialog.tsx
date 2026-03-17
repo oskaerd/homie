@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Ticket } from '@/lib/db/schema'
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -36,7 +36,6 @@ export function TicketDialog({ ticket, open, onClose, onSave, onDelete, users }:
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
-  // Reset form when ticket changes
   useEffect(() => {
     setForm(ticket ?? {})
   }, [ticket])
@@ -61,14 +60,13 @@ export function TicketDialog({ ticket, open, onClose, onSave, onDelete, users }:
   if (!ticket) return null
 
   return (
-    <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
-      <SheetContent className="w-[480px] sm:max-w-[480px] flex flex-col h-full overflow-hidden">
-        <div className="flex-1 overflow-y-auto pr-1">
-        <SheetHeader>
-          <SheetTitle>Ticket #{ticket.id}</SheetTitle>
-        </SheetHeader>
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="sm:max-w-[480px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Ticket #{ticket.id}</DialogTitle>
+        </DialogHeader>
 
-        <div className="mt-6 space-y-4">
+        <div className="space-y-4">
           <div className="space-y-1">
             <Label>Title</Label>
             <Input value={form.title ?? ''} onChange={(e) => update('title', e.target.value)} />
@@ -169,8 +167,7 @@ export function TicketDialog({ ticket, open, onClose, onSave, onDelete, users }:
             </Button>
           </div>
         </div>
-        </div>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   )
 }
