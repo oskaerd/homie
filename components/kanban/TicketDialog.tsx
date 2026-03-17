@@ -81,7 +81,7 @@ export function TicketDialog({ ticket, open, onClose, onSave, onDelete, users }:
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1">
               <Label>Status</Label>
               <Select value={form.status} onValueChange={(v) => update('status', v as Ticket['status'])}>
@@ -114,7 +114,7 @@ export function TicketDialog({ ticket, open, onClose, onSave, onDelete, users }:
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1">
               <Label>Reporter</Label>
               <Input value={form.reporter ?? ''} readOnly className="cursor-default bg-muted" />
