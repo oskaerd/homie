@@ -1,17 +1,23 @@
-# ── Stage 1: deps ────────────────────────────────────────────────────────────
+# ── Stage 1: deps (build platform, for Next.js compilation) ──────────────────
 FROM --platform=$BUILDPLATFORM node:20-alpine AS deps
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
-# ── Stage 2: builder ─────────────────────────────────────────────────────────
+# ── Stage 2: native-deps (target platform, for runtime native modules) ────────
+FROM node:20-alpine AS native-deps
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+# ── Stage 3: builder (build platform) ─────────────────────────────────────────
 FROM --platform=$BUILDPLATFORM node:20-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
 
-# ── Stage 3: runner ──────────────────────────────────────────────────────────
+# ── Stage 4: runner (target platform) ─────────────────────────────────────────
 FROM node:20-alpine AS runner
 WORKDIR /app
 
@@ -20,10 +26,14 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs \
  && adduser --system --uid 1001 nextjs
 
-# Copy only what's needed for production
+# Copy Next.js standalone output
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Override node_modules with target-platform compiled native deps
+# (fixes better-sqlite3 native binary + provides drizzle-orm for start.sh)
+COPY --from=native-deps --chown=nextjs:nodejs /app/node_modules ./node_modules
 
 # Drizzle migrations and config (needed to auto-migrate on start if desired)
 COPY --from=builder /app/lib/db/migrations ./lib/db/migrations
