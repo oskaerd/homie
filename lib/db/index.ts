@@ -15,5 +15,7 @@ const sqlite = new Database(dbPath)
 
 // Enable WAL mode for better concurrent read performance
 sqlite.pragma('journal_mode = WAL')
+// Allow waiting up to 5s when DB is locked (fixes concurrent build workers)
+sqlite.pragma('busy_timeout = 5000')
 
 export const db = drizzle(sqlite, { schema })
