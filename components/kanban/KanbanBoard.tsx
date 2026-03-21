@@ -7,9 +7,12 @@ import { KanbanColumn } from './KanbanColumn'
 import { TicketDialog } from './TicketDialog'
 import { CreateTicketDialog } from './CreateTicketDialog'
 import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
+import { Plus, Filter } from 'lucide-react'
 import { PageTitle } from '@/components/PageTitle'
 import { GradientButton } from '@/components/GradientButton'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Checkbox } from '@/components/ui/checkbox'
+import { cn } from '@/lib/utils'
 
 const COLUMNS = ['todo', 'in_progress', 'blocked', 'qa', 'done'] as const
 
@@ -29,6 +32,23 @@ export function KanbanBoard({ initialTickets, users, userName }: KanbanBoardProp
   const [tickets, setTickets] = useState<Ticket[]>(initialTickets)
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null)
   const [showCreate, setShowCreate] = useState(false)
+  const [assigneeFilter, setAssigneeFilter] = useState<Set<string>>(new Set())
+
+  const priorityOrder: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 }
+
+  function toggleFilter(value: string) {
+    setAssigneeFilter((prev) => {
+      const next = new Set(prev)
+      if (next.has(value)) next.delete(value)
+      else next.add(value)
+      return next
+    })
+  }
+
+  const isFiltered = assigneeFilter.size > 0
+  const filteredTickets = isFiltered
+    ? tickets.filter((t) => assigneeFilter.has(t.assignee ?? '__unassigned'))
+    : tickets
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -38,7 +58,9 @@ export function KanbanBoard({ initialTickets, users, userName }: KanbanBoardProp
 
   const ticketsByStatus = COLUMNS.reduce(
     (acc, status) => {
-      acc[status] = tickets.filter((t) => t.status === status)
+      acc[status] = filteredTickets
+        .filter((t) => t.status === status)
+        .sort((a, b) => (priorityOrder[a.priority] ?? 2) - (priorityOrder[b.priority] ?? 2))
       return acc
     },
     {} as Record<string, Ticket[]>
@@ -111,10 +133,54 @@ export function KanbanBoard({ initialTickets, users, userName }: KanbanBoardProp
       <div className="flex h-full flex-col gap-4">
         <div className="flex items-center justify-between">
           <PageTitle>Kanban</PageTitle>
-          <GradientButton onClick={() => setShowCreate(true)}>
-            <Plus className="h-4 w-4" />
-            New Ticket
-          </GradientButton>
+          <div className="flex items-center gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className={cn(isFiltered && 'border-primary text-primary')}>
+                  <Filter className="mr-1 h-4 w-4" />
+                  Assignee
+                  {isFiltered && ` (${assigneeFilter.size})`}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-52 p-2">
+                <div className="space-y-1">
+                  <label className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-muted">
+                    <Checkbox
+                      checked={assigneeFilter.has('__unassigned')}
+                      onCheckedChange={() => toggleFilter('__unassigned')}
+                    />
+                    <span className="text-muted-foreground italic">Unassigned</span>
+                  </label>
+                  {users.map((u) => {
+                    const label = u.name || u.email
+                    return (
+                      <label key={u.id} className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-muted">
+                        <Checkbox
+                          checked={assigneeFilter.has(label)}
+                          onCheckedChange={() => toggleFilter(label)}
+                        />
+                        {label}
+                      </label>
+                    )
+                  })}
+                  {isFiltered && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="mt-1 w-full text-xs"
+                      onClick={() => setAssigneeFilter(new Set())}
+                    >
+                      Clear filter
+                    </Button>
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
+            <GradientButton onClick={() => setShowCreate(true)}>
+              <Plus className="h-4 w-4" />
+              New Ticket
+            </GradientButton>
+          </div>
         </div>
 
         <div className="flex-1 overflow-x-auto md:overflow-hidden">
