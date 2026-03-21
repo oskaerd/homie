@@ -49,10 +49,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.id = user.id
       }
-      // Idle timeout: log out after 30 minutes of inactivity
+      // Idle timeout: log out after 10 minutes of inactivity
       const now = Math.floor(Date.now() / 1000)
       const lastActive = (token.lastActive as number) ?? now
-      if (now - lastActive > 30 * 60) return null
+      if (now - lastActive > 10 * 60) return null
       token.lastActive = now
 
       // Verify the user still exists in the DB on every token refresh
