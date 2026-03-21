@@ -56,4 +56,5 @@ next-env.d.ts
 
 # Docker image export
 *.tar
+*.tar.gz
 DEPLOY.md
