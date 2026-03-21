@@ -20,8 +20,11 @@ docker save "$IMAGE" -o "$TARBALL"
 echo "Transferring to $TARGET..."
 scp "$TARBALL" "$TARGET":~/homie-arm64.tar
 
-echo "Loading image and restarting on $TARGET..."
-ssh "$TARGET" "docker load < ~/homie-arm64.tar && cd ~/homie && docker compose up -d && rm ~/homie-arm64.tar"
+echo "Loading image on $TARGET..."
+ssh "$TARGET" "docker load < ~/homie-arm64.tar && rm ~/homie-arm64.tar"
+
+echo "Restarting containers on $TARGET..."
+ssh "$TARGET" "cd ~/homie && docker compose up -d"
 
 rm "$TARBALL"
 
