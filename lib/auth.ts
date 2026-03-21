@@ -10,7 +10,7 @@ import { ALLOWED_EMAILS } from '@/config/allowed-users'
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db),
   trustHost: true,
-  session: { strategy: 'jwt' },
+  session: { strategy: 'jwt', maxAge: 7 * 24 * 60 * 60 }, // 7 day absolute max
   pages: {
     signIn: '/login',
   },
@@ -49,6 +49,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.id = user.id
       }
+      // Idle timeout: log out after 30 minutes of inactivity
+      const now = Math.floor(Date.now() / 1000)
+      const lastActive = (token.lastActive as number) ?? now
+      if (now - lastActive > 30 * 60) return null
+      token.lastActive = now
+
       // Verify the user still exists in the DB on every token refresh
       if (token.id) {
         const dbUser = await db.select({ id: users.id }).from(users).where(eq(users.id, token.id as string)).get()
