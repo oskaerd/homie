@@ -54,8 +54,10 @@ Pages under `app/(app)/` are **Server Components** that fetch data from the DB a
 5. Add nav link in `components/Sidebar.tsx`
 
 ### Docker / RPi deployment
-- Build: `docker buildx build --platform linux/arm/v7 -t homie .`
+- Build: `docker buildx build --platform linux/arm64 -t homie .` (64-bit RPi 4)
 - `docker-compose.yml` at repo root; mounts `homie_data` volume to `/app/data`
 - `scripts/start.sh` runs Drizzle migrate then starts the Next.js standalone server
-- Required env vars: `AUTH_SECRET`, `NEXTAUTH_URL`
+- `scripts/install.sh` sets up TLS certs, backup cron, and env config on the Pi
+- `scripts/backup-db.js` backs up SQLite DB (baked into Docker image)
+- Required env vars: `AUTH_SECRET`, `NEXTAUTH_URL`, `TAILSCALE_HOSTNAME`
 - `next.config.ts` uses `output: 'standalone'` and `serverExternalPackages: ['better-sqlite3']`

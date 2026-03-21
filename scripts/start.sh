@@ -1,6 +1,6 @@
 #!/bin/sh
 # Create upload directories (persisted in the data volume)
-mkdir -p /app/data/uploads/slideshow /app/data/uploads/inventory /app/data/uploads/highscores /app/data/uploads/cookbook
+mkdir -p /app/data/uploads/slideshow /app/data/uploads/inventory /app/data/uploads/highscores /app/data/uploads/cookbook /app/data/backups
 
 # Run migrations then start the app
 node -e "
