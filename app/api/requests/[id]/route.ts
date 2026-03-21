@@ -12,11 +12,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const { id } = await params
   const body = await req.json()
-  const { completed } = body
+  const updates: Record<string, unknown> = {}
+  if (body.completed !== undefined) updates.completed = body.completed
+  if (body.priority !== undefined) updates.priority = body.priority
 
   const [row] = await db
     .update(requests)
-    .set({ completed })
+    .set(updates)
     .where(eq(requests.id, Number(id)))
     .returning()
 

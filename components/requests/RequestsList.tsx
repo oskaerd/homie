@@ -38,11 +38,22 @@ export function RequestsList({ initialRequests }: RequestsListProps) {
   const [priority, setPriority] = useState<string>('medium')
   const [saving, setSaving] = useState(false)
 
-  const sorted = [...items].sort((a, b) => {
-    if (a.completed !== b.completed) return a.completed ? 1 : -1
-    return (priorityOrder[a.priority as keyof typeof priorityOrder] ?? 2) -
-           (priorityOrder[b.priority as keyof typeof priorityOrder] ?? 2)
-  })
+  const sorted = [...items].sort((a, b) =>
+    (priorityOrder[a.priority as keyof typeof priorityOrder] ?? 2) -
+    (priorityOrder[b.priority as keyof typeof priorityOrder] ?? 2)
+  )
+
+  async function handlePriorityChange(item: Request, newPriority: string) {
+    const res = await fetch(`/api/requests/${item.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ priority: newPriority }),
+    })
+    if (res.ok) {
+      const updated: Request = await res.json()
+      setItems((prev) => prev.map((r) => (r.id === updated.id ? updated : r)))
+    }
+  }
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault()
@@ -100,14 +111,17 @@ export function RequestsList({ initialRequests }: RequestsListProps) {
                 key={item.id}
                 className="flex items-center gap-3 px-4 py-3"
               >
-                <span
-                  className={cn(
-                    'rounded border px-2 py-0.5 text-xs font-medium',
-                    priorityColors[item.priority]
-                  )}
-                >
-                  {item.priority}
-                </span>
+                <Select value={item.priority} onValueChange={(v) => handlePriorityChange(item, v)}>
+                  <SelectTrigger className={cn('h-auto w-auto gap-1 border px-2 py-0.5 text-xs font-medium', priorityColors[item.priority])}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="critical">critical</SelectItem>
+                    <SelectItem value="high">high</SelectItem>
+                    <SelectItem value="medium">medium</SelectItem>
+                    <SelectItem value="low">low</SelectItem>
+                  </SelectContent>
+                </Select>
                 <span
                   className={cn(
                     'flex-1 text-sm',
