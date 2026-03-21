@@ -30,6 +30,24 @@ import {
 } from 'date-fns'
 import { cn } from '@/lib/utils'
 
+const submitterColors = [
+  { bg: 'rgba(244,114,182,0.2)', text: 'rgb(244,114,182)' },   // pink
+  { bg: 'rgba(96,165,250,0.2)', text: 'rgb(96,165,250)' },     // blue
+  { bg: 'rgba(52,211,153,0.2)', text: 'rgb(52,211,153)' },     // green
+  { bg: 'rgba(251,146,60,0.2)', text: 'rgb(251,146,60)' },     // orange
+  { bg: 'rgba(168,85,247,0.2)', text: 'rgb(168,85,247)' },     // purple
+  { bg: 'rgba(250,204,21,0.2)', text: 'rgb(202,164,17)' },     // yellow
+  { bg: 'rgba(45,212,191,0.2)', text: 'rgb(45,212,191)' },     // teal
+  { bg: 'rgba(248,113,113,0.2)', text: 'rgb(248,113,113)' },   // red
+]
+
+function getSubmitterColor(name: string | null) {
+  if (!name) return { bg: 'rgba(var(--primary), 0.2)', text: 'rgb(var(--primary))' }
+  let hash = 0
+  for (let i = 0; i < name.length; i++) hash = ((hash << 5) - hash + name.charCodeAt(i)) | 0
+  return submitterColors[Math.abs(hash) % submitterColors.length]
+}
+
 interface CalendarViewProps {
   initialEvents: Event[]
   userName: string
@@ -199,14 +217,18 @@ export function CalendarView({ initialEvents, userName }: CalendarViewProps) {
                     {format(d, 'd')}
                   </span>
                   <div className="mt-1 space-y-0.5">
-                    {dayEvents.slice(0, 3).map((ev) => (
-                      <div
-                        key={ev.id}
-                        className="truncate rounded bg-primary/20 px-1 text-[10px] text-primary"
-                      >
-                        {ev.title}
-                      </div>
-                    ))}
+                    {dayEvents.slice(0, 3).map((ev) => {
+                      const color = getSubmitterColor(ev.submitter)
+                      return (
+                        <div
+                          key={ev.id}
+                          className="truncate rounded px-1 text-[10px]"
+                          style={{ backgroundColor: color.bg, color: color.text }}
+                        >
+                          {ev.title}
+                        </div>
+                      )
+                    })}
                     {dayEvents.length > 3 && (
                       <div className="text-[10px] text-muted-foreground">
                         +{dayEvents.length - 3} more
