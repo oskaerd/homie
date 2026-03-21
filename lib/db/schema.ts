@@ -134,7 +134,7 @@ export const events = sqliteTable('events', {
   location: text('location'),
   submitter: text('submitter'),
   startTime: text('start_time').notNull(), // ISO datetime string
-  endTime: text('end_time').notNull(),     // ISO datetime string
+  endTime: text('end_time'),               // ISO datetime string (optional)
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(strftime('%s','now'))`),
 })
 

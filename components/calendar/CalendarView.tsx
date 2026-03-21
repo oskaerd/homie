@@ -70,7 +70,8 @@ export function CalendarView({ initialEvents, userName }: CalendarViewProps) {
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault()
-    if (!form.title || !form.startTime || !form.endTime) return
+    if (!form.title || !form.startTime) return
+    if (form.endTime && form.endTime < form.startTime) return
     setSaving(true)
     const res = await fetch('/api/events', {
       method: 'POST',
@@ -205,8 +206,8 @@ export function CalendarView({ initialEvents, userName }: CalendarViewProps) {
                       <p className="text-xs text-muted-foreground">{ev.location}</p>
                     )}
                     <p className="text-xs text-muted-foreground">
-                      {format(parseISO(ev.startTime), 'HH:mm')} –{' '}
-                      {format(parseISO(ev.endTime), 'HH:mm')}
+                      {format(parseISO(ev.startTime), 'HH:mm')}
+                      {ev.endTime && ` – ${format(parseISO(ev.endTime), 'HH:mm')}`}
                     </p>
                     {ev.submitter && (
                       <p className="text-xs text-muted-foreground">by {ev.submitter}</p>
@@ -253,7 +254,8 @@ export function CalendarView({ initialEvents, userName }: CalendarViewProps) {
               <Label>Submitted by</Label>
               <Input
                 value={form.submitter ?? ''}
-                onChange={(e) => update('submitter', e.target.value)}
+                readOnly
+                className="bg-muted"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -267,12 +269,12 @@ export function CalendarView({ initialEvents, userName }: CalendarViewProps) {
                 />
               </div>
               <div className="space-y-1">
-                <Label>End *</Label>
+                <Label>End</Label>
                 <Input
                   type="datetime-local"
                   value={form.endTime ?? ''}
                   onChange={(e) => update('endTime', e.target.value)}
-                  required
+                  min={form.startTime ?? undefined}
                 />
               </div>
             </div>

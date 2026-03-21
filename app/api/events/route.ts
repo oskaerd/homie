@@ -30,15 +30,20 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
-  const { title, location, submitter, startTime, endTime } = body
+  const { title, location, startTime, endTime } = body
+  const submitter = session.user?.name ?? session.user?.email ?? 'Unknown'
 
-  if (!title || !startTime || !endTime) {
-    return NextResponse.json({ error: 'title, startTime, endTime required' }, { status: 400 })
+  if (!title || !startTime) {
+    return NextResponse.json({ error: 'title, startTime required' }, { status: 400 })
+  }
+
+  if (endTime && endTime < startTime) {
+    return NextResponse.json({ error: 'endTime must not be before startTime' }, { status: 400 })
   }
 
   const [row] = await db
     .insert(events)
-    .values({ title, location, submitter, startTime, endTime })
+    .values({ title, location, submitter, startTime, endTime: endTime || null })
     .returning()
 
   return NextResponse.json(row, { status: 201 })

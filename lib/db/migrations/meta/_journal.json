@@ -43,6 +43,13 @@
       "when": 1773100972391,
       "tag": "0005_freezing_warhawk",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1774122713517,
+      "tag": "0006_nappy_shriek",
+      "breakpoints": true
     }
   ]
 }
