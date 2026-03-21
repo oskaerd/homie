@@ -39,7 +39,8 @@ export function CalendarView({ initialEvents, userName }: CalendarViewProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [events, setEvents] = useState<Event[]>(initialEvents)
   const [selectedDay, setSelectedDay] = useState<Date | null>(null)
-  const [showCreate, setShowCreate] = useState(false)
+  const [showDialog, setShowDialog] = useState(false)
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null)
   const [form, setForm] = useState<Partial<NewEvent>>({ submitter: userName })
   const [saving, setSaving] = useState(false)
 
@@ -68,21 +69,49 @@ export function CalendarView({ initialEvents, userName }: CalendarViewProps) {
     return events.filter((e) => isSameDay(parseISO(e.startTime), date))
   }
 
-  async function handleCreate(e: React.FormEvent) {
+  function openEdit(ev: Event) {
+    setEditingEvent(ev)
+    setForm({
+      title: ev.title,
+      location: ev.location ?? '',
+      submitter: ev.submitter ?? '',
+      startTime: ev.startTime,
+      endTime: ev.endTime ?? '',
+    })
+    setShowDialog(true)
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!form.title || !form.startTime) return
     if (form.endTime && form.endTime < form.startTime) return
     setSaving(true)
-    const res = await fetch('/api/events', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    })
-    if (res.ok) {
-      const created: Event = await res.json()
-      setEvents((prev) => [...prev, created])
-      setShowCreate(false)
-      setForm({ submitter: userName })
+
+    if (editingEvent) {
+      const res = await fetch(`/api/events/${editingEvent.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      if (res.ok) {
+        const updated: Event = await res.json()
+        setEvents((prev) => prev.map((ev) => (ev.id === updated.id ? updated : ev)))
+        setShowDialog(false)
+        setEditingEvent(null)
+        setForm({ submitter: userName })
+      }
+    } else {
+      const res = await fetch('/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      if (res.ok) {
+        const created: Event = await res.json()
+        setEvents((prev) => [...prev, created])
+        setShowDialog(false)
+        setForm({ submitter: userName })
+      }
     }
     setSaving(false)
   }
@@ -100,7 +129,8 @@ export function CalendarView({ initialEvents, userName }: CalendarViewProps) {
         <PageTitle>Calendar</PageTitle>
         <GradientButton
           onClick={() => {
-            setShowCreate(true)
+            setEditingEvent(null)
+            setShowDialog(true)
             if (selectedDay) {
               const dateStr = format(selectedDay, "yyyy-MM-dd'T'HH:mm")
               setForm({ submitter: userName, startTime: dateStr })
@@ -199,7 +229,11 @@ export function CalendarView({ initialEvents, userName }: CalendarViewProps) {
           ) : (
             <div className="space-y-2">
               {selectedDayEvents.map((ev) => (
-                <div key={ev.id} className="flex items-start justify-between rounded border p-3">
+                <button
+                  key={ev.id}
+                  onClick={() => openEdit(ev)}
+                  className="flex w-full items-start justify-between rounded border p-3 text-left hover:bg-muted/40"
+                >
                   <div>
                     <p className="font-medium">{ev.title}</p>
                     {ev.location && (
@@ -213,28 +247,30 @@ export function CalendarView({ initialEvents, userName }: CalendarViewProps) {
                       <p className="text-xs text-muted-foreground">by {ev.submitter}</p>
                     )}
                   </div>
-                  <Button
-                    size="icon"
-                    variant="ghost"
+                  <span
+                    role="button"
                     className="text-destructive hover:text-destructive"
-                    onClick={() => handleDelete(ev.id)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDelete(ev.id)
+                    }}
                   >
                     <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
+                  </span>
+                </button>
               ))}
             </div>
           )}
         </div>
       )}
 
-      {/* Create event dialog */}
-      <Dialog open={showCreate} onOpenChange={(o) => !o && setShowCreate(false)}>
+      {/* Create/Edit event dialog */}
+      <Dialog open={showDialog} onOpenChange={(o) => { if (!o) { setShowDialog(false); setEditingEvent(null); setForm({ submitter: userName }) } }}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
-            <DialogTitle>Add Event</DialogTitle>
+            <DialogTitle>{editingEvent ? 'Edit Event' : 'Add Event'}</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleCreate} className="space-y-3">
+          <form onSubmit={handleSubmit} className="space-y-3">
             <div className="space-y-1">
               <Label>Title *</Label>
               <Input
@@ -279,11 +315,11 @@ export function CalendarView({ initialEvents, userName }: CalendarViewProps) {
               </div>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setShowCreate(false)}>
+              <Button type="button" variant="outline" onClick={() => { setShowDialog(false); setEditingEvent(null); setForm({ submitter: userName }) }}>
                 Cancel
               </Button>
               <Button type="submit" disabled={saving}>
-                {saving ? 'Saving…' : 'Add Event'}
+                {saving ? 'Saving…' : editingEvent ? 'Save Changes' : 'Add Event'}
               </Button>
             </DialogFooter>
           </form>
