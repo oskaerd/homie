@@ -138,6 +138,17 @@ export const events = sqliteTable('events', {
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(strftime('%s','now'))`),
 })
 
+// ─── Requests ─────────────────────────────────────────────────────────────────
+
+export const requests = sqliteTable('requests', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  title: text('title').notNull(),
+  priority: text('priority', { enum: ['critical', 'high', 'medium', 'low'] }).notNull().default('medium'),
+  completed: integer('completed', { mode: 'boolean' }).notNull().default(false),
+  submitter: text('submitter'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(strftime('%s','now'))`),
+})
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type User = typeof users.$inferSelect
@@ -156,3 +167,5 @@ export type WishlistItem = typeof wishlist.$inferSelect
 export type NewWishlistItem = typeof wishlist.$inferInsert
 export type Recipe = typeof recipes.$inferSelect
 export type NewRecipe = typeof recipes.$inferInsert
+export type Request = typeof requests.$inferSelect
+export type NewRequest = typeof requests.$inferInsert

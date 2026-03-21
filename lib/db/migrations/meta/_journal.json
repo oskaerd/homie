@@ -50,6 +50,13 @@
       "when": 1774122713517,
       "tag": "0006_nappy_shriek",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1774132193622,
+      "tag": "0007_first_black_bird",
+      "breakpoints": true
     }
   ]
 }

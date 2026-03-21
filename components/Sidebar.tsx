@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
-import { Home, ClipboardList, Package, UtensilsCrossed, CalendarDays, Gift, Trophy, BookOpen, LogOut } from 'lucide-react'
+import { Home, ClipboardList, Package, UtensilsCrossed, CalendarDays, Gift, Trophy, BookOpen, MessageSquarePlus, LogOut } from 'lucide-react'
 import { LanguageSelect } from '@/components/LanguageSelect'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -17,6 +17,7 @@ const navItems = [
   { href: '/wishlist', label: 'Wishlist', icon: Gift },
   { href: '/highscores', label: 'Highscores', icon: Trophy },
   { href: '/cookbook', label: 'Cookbook', icon: BookOpen },
+  { href: '/requests', label: 'Requests', icon: MessageSquarePlus },
 ]
 
 interface SidebarProps {
