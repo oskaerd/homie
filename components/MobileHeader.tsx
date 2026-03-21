@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
-import { Menu, Home, ClipboardList, Package, UtensilsCrossed, CalendarDays, Gift, Trophy, BookOpen, LogOut } from 'lucide-react'
+import { Menu, Home, ClipboardList, Package, UtensilsCrossed, CalendarDays, Gift, Trophy, BookOpen, MessageSquarePlus, LogOut } from 'lucide-react'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Button } from '@/components/ui/button'
@@ -19,6 +19,7 @@ const navItems = [
   { href: '/wishlist',   label: 'Wishlist',   icon: Gift },
   { href: '/highscores', label: 'Highscores', icon: Trophy },
   { href: '/cookbook',   label: 'Cookbook',   icon: BookOpen },
+  { href: '/requests',  label: 'Requests',  icon: MessageSquarePlus },
 ]
 
 interface Props {
@@ -34,7 +35,8 @@ export function MobileHeader({ user }: Props) {
       <Button variant="ghost" size="icon" onClick={() => setOpen(true)} style={{ color: '#9b78c9' }}>
         <Menu className="h-5 w-5" />
       </Button>
-      <span
+      <Link
+        href="/home"
         className="ml-3 text-xl font-bold tracking-tight"
         style={{
           fontFamily: 'var(--font-space-mono), monospace',
@@ -46,7 +48,7 @@ export function MobileHeader({ user }: Props) {
         }}
       >
         HOMIE
-      </span>
+      </Link>
 
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="left" className="flex w-56 flex-col p-0 border-r" style={{ borderColor: 'rgba(168,85,247,0.2)', background: 'var(--card)' }}>
