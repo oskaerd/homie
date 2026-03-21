@@ -103,7 +103,7 @@ export function CalendarView({ initialEvents, userName }: CalendarViewProps) {
             setShowCreate(true)
             if (selectedDay) {
               const dateStr = format(selectedDay, "yyyy-MM-dd'T'HH:mm")
-              setForm({ submitter: userName, startTime: dateStr, endTime: dateStr })
+              setForm({ submitter: userName, startTime: dateStr })
             } else {
               setForm({ submitter: userName })
             }
