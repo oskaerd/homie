@@ -76,7 +76,7 @@ fi
 
 # ── Backup cron ───────────────────────────────────────────────────────────────
 
-BACKUP_CRON="*/30 * * * * docker exec homie node scripts/backup-db.js --keep 48"
+BACKUP_CRON="*/30 * * * * docker compose -f $REPO_DIR/docker-compose.yml exec homie node scripts/backup-db.js --keep 48"
 
 if crontab -l 2>/dev/null | grep -qF "backup-db.js"; then
   echo "Backup cron already installed, skipping."
